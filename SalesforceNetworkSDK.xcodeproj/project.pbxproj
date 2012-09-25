@@ -1,0 +1,387 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1001EA7516111E40006E377C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1001EA7416111E40006E377C /* UIKit.framework */; };
+		1001EA7716111E40006E377C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1001EA7616111E40006E377C /* Foundation.framework */; };
+		1001EA7916111E40006E377C /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1001EA7816111E40006E377C /* CoreGraphics.framework */; };
+		1001EA7F16111E40006E377C /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 1001EA7D16111E40006E377C /* InfoPlist.strings */; };
+		1001EA8116111E40006E377C /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 1001EA8016111E40006E377C /* main.m */; };
+		1001EA8516111E40006E377C /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1001EA8416111E40006E377C /* AppDelegate.m */; };
+		1001EA8716111E40006E377C /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 1001EA8616111E40006E377C /* Default.png */; };
+		1001EA8916111E40006E377C /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1001EA8816111E40006E377C /* Default@2x.png */; };
+		1001EA8B16111E40006E377C /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 1001EA8A16111E40006E377C /* Default-568h@2x.png */; };
+		1001EA9316111E92006E377C /* SFNetworkEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 1001EA9216111E92006E377C /* SFNetworkEngine.m */; };
+		10DBAC181612051700FCBF62 /* libSalesforceOAuth.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 10DBAC171612051700FCBF62 /* libSalesforceOAuth.a */; };
+		10DBAC1B161205C800FCBF62 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10DBAC1A161205C800FCBF62 /* Security.framework */; };
+		10DBAC271612078200FCBF62 /* SFNetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 10DBAC261612078200FCBF62 /* SFNetworkOperation.m */; };
+		10DBAC2B16120D9500FCBF62 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 10DBAC2A16120D9500FCBF62 /* Reachability.m */; };
+		10DBAC2E1612247800FCBF62 /* SFNetworkUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 10DBAC2D1612247700FCBF62 /* SFNetworkUtils.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1001EA7016111E40006E377C /* SalesforceNetworkSDK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SalesforceNetworkSDK.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1001EA7416111E40006E377C /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		1001EA7616111E40006E377C /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		1001EA7816111E40006E377C /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		1001EA7C16111E40006E377C /* SalesforceNetworkSDK-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SalesforceNetworkSDK-Info.plist"; sourceTree = "<group>"; };
+		1001EA7E16111E40006E377C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		1001EA8016111E40006E377C /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		1001EA8216111E40006E377C /* SalesforceNetworkSDK-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SalesforceNetworkSDK-Prefix.pch"; sourceTree = "<group>"; };
+		1001EA8316111E40006E377C /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		1001EA8416111E40006E377C /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		1001EA8616111E40006E377C /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		1001EA8816111E40006E377C /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
+		1001EA8A16111E40006E377C /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		1001EA9116111E92006E377C /* SFNetworkEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkEngine.h; sourceTree = "<group>"; };
+		1001EA9216111E92006E377C /* SFNetworkEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFNetworkEngine.m; sourceTree = "<group>"; };
+		10DBAC141612051700FCBF62 /* SFOAuthCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCoordinator.h; sourceTree = "<group>"; };
+		10DBAC151612051700FCBF62 /* SFOAuthCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCredentials.h; sourceTree = "<group>"; };
+		10DBAC171612051700FCBF62 /* libSalesforceOAuth.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSalesforceOAuth.a; sourceTree = "<group>"; };
+		10DBAC1A161205C800FCBF62 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		10DBAC251612078200FCBF62 /* SFNetworkOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkOperation.h; sourceTree = "<group>"; };
+		10DBAC261612078200FCBF62 /* SFNetworkOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFNetworkOperation.m; sourceTree = "<group>"; };
+		10DBAC2916120D9500FCBF62 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		10DBAC2A16120D9500FCBF62 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		10DBAC2C1612247700FCBF62 /* SFNetworkUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkUtils.h; sourceTree = "<group>"; };
+		10DBAC2D1612247700FCBF62 /* SFNetworkUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFNetworkUtils.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		1001EA6D16111E40006E377C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10DBAC1B161205C800FCBF62 /* Security.framework in Frameworks */,
+				1001EA7516111E40006E377C /* UIKit.framework in Frameworks */,
+				1001EA7716111E40006E377C /* Foundation.framework in Frameworks */,
+				1001EA7916111E40006E377C /* CoreGraphics.framework in Frameworks */,
+				10DBAC181612051700FCBF62 /* libSalesforceOAuth.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		1001EA6516111E40006E377C = {
+			isa = PBXGroup;
+			children = (
+				10DBAC1A161205C800FCBF62 /* Security.framework */,
+				10DBAC101612051700FCBF62 /* dependencies */,
+				1001EA7A16111E40006E377C /* NetworkSDK */,
+				1001EA7316111E40006E377C /* Frameworks */,
+				1001EA7116111E40006E377C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		1001EA7116111E40006E377C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1001EA7016111E40006E377C /* SalesforceNetworkSDK.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		1001EA7316111E40006E377C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				1001EA7416111E40006E377C /* UIKit.framework */,
+				1001EA7616111E40006E377C /* Foundation.framework */,
+				1001EA7816111E40006E377C /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		1001EA7A16111E40006E377C /* NetworkSDK */ = {
+			isa = PBXGroup;
+			children = (
+				1001EA8316111E40006E377C /* AppDelegate.h */,
+				1001EA8416111E40006E377C /* AppDelegate.m */,
+				1001EA7B16111E40006E377C /* Supporting Files */,
+				1001EA9116111E92006E377C /* SFNetworkEngine.h */,
+				1001EA9216111E92006E377C /* SFNetworkEngine.m */,
+				10DBAC251612078200FCBF62 /* SFNetworkOperation.h */,
+				10DBAC261612078200FCBF62 /* SFNetworkOperation.m */,
+				10DBAC2C1612247700FCBF62 /* SFNetworkUtils.h */,
+				10DBAC2D1612247700FCBF62 /* SFNetworkUtils.m */,
+			);
+			path = NetworkSDK;
+			sourceTree = "<group>";
+		};
+		1001EA7B16111E40006E377C /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				1001EA7C16111E40006E377C /* SalesforceNetworkSDK-Info.plist */,
+				1001EA7D16111E40006E377C /* InfoPlist.strings */,
+				1001EA8016111E40006E377C /* main.m */,
+				1001EA8216111E40006E377C /* SalesforceNetworkSDK-Prefix.pch */,
+				1001EA8616111E40006E377C /* Default.png */,
+				1001EA8816111E40006E377C /* Default@2x.png */,
+				1001EA8A16111E40006E377C /* Default-568h@2x.png */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		10DBAC101612051700FCBF62 /* dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				10DBAC2816120D9500FCBF62 /* Reachability */,
+				10DBAC111612051700FCBF62 /* SalesforceOAuth */,
+			);
+			path = dependencies;
+			sourceTree = "<group>";
+		};
+		10DBAC111612051700FCBF62 /* SalesforceOAuth */ = {
+			isa = PBXGroup;
+			children = (
+				10DBAC121612051700FCBF62 /* Headers */,
+				10DBAC161612051700FCBF62 /* Libraries */,
+			);
+			path = SalesforceOAuth;
+			sourceTree = "<group>";
+		};
+		10DBAC121612051700FCBF62 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				10DBAC131612051700FCBF62 /* SalesforceOAuth */,
+			);
+			path = Headers;
+			sourceTree = "<group>";
+		};
+		10DBAC131612051700FCBF62 /* SalesforceOAuth */ = {
+			isa = PBXGroup;
+			children = (
+				10DBAC141612051700FCBF62 /* SFOAuthCoordinator.h */,
+				10DBAC151612051700FCBF62 /* SFOAuthCredentials.h */,
+			);
+			path = SalesforceOAuth;
+			sourceTree = "<group>";
+		};
+		10DBAC161612051700FCBF62 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				10DBAC171612051700FCBF62 /* libSalesforceOAuth.a */,
+			);
+			path = Libraries;
+			sourceTree = "<group>";
+		};
+		10DBAC2816120D9500FCBF62 /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				10DBAC2916120D9500FCBF62 /* Reachability.h */,
+				10DBAC2A16120D9500FCBF62 /* Reachability.m */,
+			);
+			path = Reachability;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		1001EA6F16111E40006E377C /* SalesforceNetworkSDK */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1001EA8E16111E40006E377C /* Build configuration list for PBXNativeTarget "SalesforceNetworkSDK" */;
+			buildPhases = (
+				1001EA6C16111E40006E377C /* Sources */,
+				1001EA6D16111E40006E377C /* Frameworks */,
+				1001EA6E16111E40006E377C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SalesforceNetworkSDK;
+			productName = NetworkSDK;
+			productReference = 1001EA7016111E40006E377C /* SalesforceNetworkSDK.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		1001EA6716111E40006E377C /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0450;
+				ORGANIZATIONNAME = salesforce.com;
+			};
+			buildConfigurationList = 1001EA6A16111E40006E377C /* Build configuration list for PBXProject "SalesforceNetworkSDK" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 1001EA6516111E40006E377C;
+			productRefGroup = 1001EA7116111E40006E377C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				1001EA6F16111E40006E377C /* SalesforceNetworkSDK */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		1001EA6E16111E40006E377C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1001EA7F16111E40006E377C /* InfoPlist.strings in Resources */,
+				1001EA8716111E40006E377C /* Default.png in Resources */,
+				1001EA8916111E40006E377C /* Default@2x.png in Resources */,
+				1001EA8B16111E40006E377C /* Default-568h@2x.png in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		1001EA6C16111E40006E377C /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1001EA8116111E40006E377C /* main.m in Sources */,
+				1001EA8516111E40006E377C /* AppDelegate.m in Sources */,
+				1001EA9316111E92006E377C /* SFNetworkEngine.m in Sources */,
+				10DBAC271612078200FCBF62 /* SFNetworkOperation.m in Sources */,
+				10DBAC2B16120D9500FCBF62 /* Reachability.m in Sources */,
+				10DBAC2E1612247800FCBF62 /* SFNetworkUtils.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		1001EA7D16111E40006E377C /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				1001EA7E16111E40006E377C /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		1001EA8C16111E40006E377C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1001EA8D16111E40006E377C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		1001EA8F16111E40006E377C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "NetworkSDK/SalesforceNetworkSDK-Prefix.pch";
+				INFOPLIST_FILE = "NetworkSDK/SalesforceNetworkSDK-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/dependencies/SalesforceOAuth/Libraries\"",
+				);
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				PRODUCT_NAME = SalesforceNetworkSDK;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		1001EA9016111E40006E377C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_WARN_OBJCPP_ARC_ABI = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "NetworkSDK/SalesforceNetworkSDK-Prefix.pch";
+				INFOPLIST_FILE = "NetworkSDK/SalesforceNetworkSDK-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/dependencies/SalesforceOAuth/Libraries\"",
+				);
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				PRODUCT_NAME = SalesforceNetworkSDK;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1001EA6A16111E40006E377C /* Build configuration list for PBXProject "SalesforceNetworkSDK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1001EA8C16111E40006E377C /* Debug */,
+				1001EA8D16111E40006E377C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1001EA8E16111E40006E377C /* Build configuration list for PBXNativeTarget "SalesforceNetworkSDK" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1001EA8F16111E40006E377C /* Debug */,
+				1001EA9016111E40006E377C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 1001EA6716111E40006E377C /* Project object */;
+}
