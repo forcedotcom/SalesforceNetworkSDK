@@ -7,29 +7,55 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		100F54091614E03800FD5EB8 /* SFNetworkEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B76165161276F700B3CD58 /* SFNetworkEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		100F540A1614E04300FD5EB8 /* SFNetworkOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B76167161276F700B3CD58 /* SFNetworkOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		100F540B1614E04900FD5EB8 /* SFNetworkUtils.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B76169161276F700B3CD58 /* SFNetworkUtils.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		100F54511614E2CB00FD5EB8 /* SFNetworkEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B76166161276F700B3CD58 /* SFNetworkEngine.m */; };
+		100F54521614E2CE00FD5EB8 /* SFNetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B76168161276F700B3CD58 /* SFNetworkOperation.m */; };
+		100F54531614E2D000FD5EB8 /* SFNetworkUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B7616A161276F700B3CD58 /* SFNetworkUtils.m */; };
+		100F54781614EAAA00FD5EB8 /* NSData+Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54661614EAAA00FD5EB8 /* NSData+Base64.h */; };
+		100F54791614EAAA00FD5EB8 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54671614EAAA00FD5EB8 /* NSData+Base64.m */; };
+		100F547A1614EAAA00FD5EB8 /* NSDate+RFC1123.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54681614EAAA00FD5EB8 /* NSDate+RFC1123.h */; };
+		100F547B1614EAAA00FD5EB8 /* NSDate+RFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54691614EAAA00FD5EB8 /* NSDate+RFC1123.m */; };
+		100F547C1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F546A1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.h */; };
+		100F547D1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F546B1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.m */; };
+		100F547E1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F546C1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.h */; };
+		100F547F1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F546D1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.m */; };
+		100F54801614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F546E1614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.h */; };
+		100F54811614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F546F1614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.m */; };
+		100F54821614EAAA00FD5EB8 /* MKNetworkEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54701614EAAA00FD5EB8 /* MKNetworkEngine.h */; };
+		100F54831614EAAA00FD5EB8 /* MKNetworkEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54711614EAAA00FD5EB8 /* MKNetworkEngine.m */; };
+		100F54841614EAAA00FD5EB8 /* MKNetworkKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54721614EAAA00FD5EB8 /* MKNetworkKit.h */; };
+		100F54851614EAAA00FD5EB8 /* MKNetworkOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54731614EAAA00FD5EB8 /* MKNetworkOperation.h */; };
+		100F54861614EAAA00FD5EB8 /* MKNetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54741614EAAA00FD5EB8 /* MKNetworkOperation.m */; };
+		100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */; };
+		107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */; };
 		1090C539161275BF0054B040 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1090C538161275BF0054B040 /* Foundation.framework */; };
-		10B7616C161276F700B3CD58 /* SFNetworkEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B76166161276F700B3CD58 /* SFNetworkEngine.m */; };
-		10B7616D161276F700B3CD58 /* SFNetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B76168161276F700B3CD58 /* SFNetworkOperation.m */; };
-		10B7616E161276F700B3CD58 /* SFNetworkUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B7616A161276F700B3CD58 /* SFNetworkUtils.m */; };
-		10B7617F1612774500B3CD58 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B761771612774500B3CD58 /* Reachability.m */; };
 		10B761821612775400B3CD58 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761811612775400B3CD58 /* Security.framework */; };
 		10B761841612775C00B3CD58 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761831612775C00B3CD58 /* MobileCoreServices.framework */; };
 		10B761861612776000B3CD58 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761851612776000B3CD58 /* SystemConfiguration.framework */; };
+		10C7514116151E98008139FD /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 10C7513F16151E98008139FD /* Reachability.h */; };
+		10C7514216151E98008139FD /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 10C7514016151E98008139FD /* Reachability.m */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		1090C533161275BF0054B040 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = "include/${PRODUCT_NAME}";
-			dstSubfolderSpec = 16;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
+		100F54661614EAAA00FD5EB8 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
+		100F54671614EAAA00FD5EB8 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
+		100F54681614EAAA00FD5EB8 /* NSDate+RFC1123.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+RFC1123.h"; sourceTree = "<group>"; };
+		100F54691614EAAA00FD5EB8 /* NSDate+RFC1123.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+RFC1123.m"; sourceTree = "<group>"; };
+		100F546A1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+RequestEncoding.h"; sourceTree = "<group>"; };
+		100F546B1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+RequestEncoding.m"; sourceTree = "<group>"; };
+		100F546C1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+MKNetworkKitAdditions.h"; sourceTree = "<group>"; };
+		100F546D1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+MKNetworkKitAdditions.m"; sourceTree = "<group>"; };
+		100F546E1614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+MKNetworkKitAdditions.h"; sourceTree = "<group>"; };
+		100F546F1614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+MKNetworkKitAdditions.m"; sourceTree = "<group>"; };
+		100F54701614EAAA00FD5EB8 /* MKNetworkEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKNetworkEngine.h; sourceTree = "<group>"; };
+		100F54711614EAAA00FD5EB8 /* MKNetworkEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKNetworkEngine.m; sourceTree = "<group>"; };
+		100F54721614EAAA00FD5EB8 /* MKNetworkKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKNetworkKit.h; sourceTree = "<group>"; };
+		100F54731614EAAA00FD5EB8 /* MKNetworkOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKNetworkOperation.h; sourceTree = "<group>"; };
+		100F54741614EAAA00FD5EB8 /* MKNetworkOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKNetworkOperation.m; sourceTree = "<group>"; };
+		100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFNetworkOperation+Internal.h"; sourceTree = "<group>"; };
+		107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFNetworkEngine+Internal.h"; sourceTree = "<group>"; };
 		1090C535161275BF0054B040 /* libSalesforceNetworkSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSalesforceNetworkSDK.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1090C538161275BF0054B040 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		10B76165161276F700B3CD58 /* SFNetworkEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkEngine.h; sourceTree = "<group>"; };
@@ -38,15 +64,12 @@
 		10B76168161276F700B3CD58 /* SFNetworkOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFNetworkOperation.m; sourceTree = "<group>"; };
 		10B76169161276F700B3CD58 /* SFNetworkUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkUtils.h; sourceTree = "<group>"; };
 		10B7616A161276F700B3CD58 /* SFNetworkUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFNetworkUtils.m; sourceTree = "<group>"; };
-		10B761731612773900B3CD58 /* SalesforceNetworkSDK-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SalesforceNetworkSDK-Prefix.pch"; path = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch"; sourceTree = "<group>"; };
-		10B761761612774500B3CD58 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		10B761771612774500B3CD58 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
-		10B7617B1612774500B3CD58 /* SFOAuthCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCoordinator.h; sourceTree = "<group>"; };
-		10B7617C1612774500B3CD58 /* SFOAuthCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCredentials.h; sourceTree = "<group>"; };
-		10B7617E1612774500B3CD58 /* libSalesforceOAuth.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSalesforceOAuth.a; sourceTree = "<group>"; };
+		10B761731612773900B3CD58 /* SalesforceNetworkSDK-Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SalesforceNetworkSDK-Prefix.pch"; sourceTree = "<group>"; };
 		10B761811612775400B3CD58 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		10B761831612775C00B3CD58 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		10B761851612776000B3CD58 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		10C7513F16151E98008139FD /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		10C7514016151E98008139FD /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,10 +87,39 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		100F54641614EAAA00FD5EB8 /* MKNetworkKit */ = {
+			isa = PBXGroup;
+			children = (
+				100F54651614EAAA00FD5EB8 /* Categories */,
+				100F54701614EAAA00FD5EB8 /* MKNetworkEngine.h */,
+				100F54711614EAAA00FD5EB8 /* MKNetworkEngine.m */,
+				100F54721614EAAA00FD5EB8 /* MKNetworkKit.h */,
+				100F54731614EAAA00FD5EB8 /* MKNetworkOperation.h */,
+				100F54741614EAAA00FD5EB8 /* MKNetworkOperation.m */,
+			);
+			path = MKNetworkKit;
+			sourceTree = "<group>";
+		};
+		100F54651614EAAA00FD5EB8 /* Categories */ = {
+			isa = PBXGroup;
+			children = (
+				100F54661614EAAA00FD5EB8 /* NSData+Base64.h */,
+				100F54671614EAAA00FD5EB8 /* NSData+Base64.m */,
+				100F54681614EAAA00FD5EB8 /* NSDate+RFC1123.h */,
+				100F54691614EAAA00FD5EB8 /* NSDate+RFC1123.m */,
+				100F546A1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.h */,
+				100F546B1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.m */,
+				100F546C1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.h */,
+				100F546D1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.m */,
+				100F546E1614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.h */,
+				100F546F1614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.m */,
+			);
+			path = Categories;
+			sourceTree = "<group>";
+		};
 		1090C52A161275BF0054B040 = {
 			isa = PBXGroup;
 			children = (
-				10B761741612774500B3CD58 /* dependencies */,
 				1090C53A161275BF0054B040 /* SalesforceNetworkSDK */,
 				1090C537161275BF0054B040 /* Frameworks */,
 				1090C536161275BF0054B040 /* Products */,
@@ -96,9 +148,13 @@
 		1090C53A161275BF0054B040 /* SalesforceNetworkSDK */ = {
 			isa = PBXGroup;
 			children = (
+				10C7513E16151E98008139FD /* Reachability */,
+				100F54641614EAAA00FD5EB8 /* MKNetworkKit */,
 				10B76165161276F700B3CD58 /* SFNetworkEngine.h */,
+				107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */,
 				10B76166161276F700B3CD58 /* SFNetworkEngine.m */,
 				10B76167161276F700B3CD58 /* SFNetworkOperation.h */,
+				100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */,
 				10B76168161276F700B3CD58 /* SFNetworkOperation.m */,
 				10B76169161276F700B3CD58 /* SFNetworkUtils.h */,
 				10B7616A161276F700B3CD58 /* SFNetworkUtils.m */,
@@ -115,68 +171,50 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		10B761741612774500B3CD58 /* dependencies */ = {
+		10C7513E16151E98008139FD /* Reachability */ = {
 			isa = PBXGroup;
 			children = (
-				10B761751612774500B3CD58 /* Reachability */,
-				10B761781612774500B3CD58 /* SalesforceOAuth */,
-			);
-			path = dependencies;
-			sourceTree = "<group>";
-		};
-		10B761751612774500B3CD58 /* Reachability */ = {
-			isa = PBXGroup;
-			children = (
-				10B761761612774500B3CD58 /* Reachability.h */,
-				10B761771612774500B3CD58 /* Reachability.m */,
+				10C7513F16151E98008139FD /* Reachability.h */,
+				10C7514016151E98008139FD /* Reachability.m */,
 			);
 			path = Reachability;
 			sourceTree = "<group>";
 		};
-		10B761781612774500B3CD58 /* SalesforceOAuth */ = {
-			isa = PBXGroup;
-			children = (
-				10B761791612774500B3CD58 /* Headers */,
-				10B7617D1612774500B3CD58 /* Libraries */,
-			);
-			path = SalesforceOAuth;
-			sourceTree = "<group>";
-		};
-		10B761791612774500B3CD58 /* Headers */ = {
-			isa = PBXGroup;
-			children = (
-				10B7617A1612774500B3CD58 /* SalesforceOAuth */,
-			);
-			path = Headers;
-			sourceTree = "<group>";
-		};
-		10B7617A1612774500B3CD58 /* SalesforceOAuth */ = {
-			isa = PBXGroup;
-			children = (
-				10B7617B1612774500B3CD58 /* SFOAuthCoordinator.h */,
-				10B7617C1612774500B3CD58 /* SFOAuthCredentials.h */,
-			);
-			path = SalesforceOAuth;
-			sourceTree = "<group>";
-		};
-		10B7617D1612774500B3CD58 /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				10B7617E1612774500B3CD58 /* libSalesforceOAuth.a */,
-			);
-			path = Libraries;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		100F54081614E03000FD5EB8 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				100F54091614E03800FD5EB8 /* SFNetworkEngine.h in Headers */,
+				100F540A1614E04300FD5EB8 /* SFNetworkOperation.h in Headers */,
+				100F540B1614E04900FD5EB8 /* SFNetworkUtils.h in Headers */,
+				100F54781614EAAA00FD5EB8 /* NSData+Base64.h in Headers */,
+				100F547A1614EAAA00FD5EB8 /* NSDate+RFC1123.h in Headers */,
+				100F547C1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.h in Headers */,
+				100F547E1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.h in Headers */,
+				100F54801614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.h in Headers */,
+				100F54821614EAAA00FD5EB8 /* MKNetworkEngine.h in Headers */,
+				100F54841614EAAA00FD5EB8 /* MKNetworkKit.h in Headers */,
+				100F54851614EAAA00FD5EB8 /* MKNetworkOperation.h in Headers */,
+				100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */,
+				10C7514116151E98008139FD /* Reachability.h in Headers */,
+				107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
 		1090C534161275BF0054B040 /* SalesforceNetworkSDK */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 1090C543161275BF0054B040 /* Build configuration list for PBXNativeTarget "SalesforceNetworkSDK" */;
 			buildPhases = (
-				1090C531161275BF0054B040 /* Sources */,
+				100F54501614E2C000FD5EB8 /* Sources */,
 				1090C532161275BF0054B040 /* Frameworks */,
-				1090C533161275BF0054B040 /* CopyFiles */,
+				100F54081614E03000FD5EB8 /* Headers */,
+				100F54071614DF7300FD5EB8 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -213,15 +251,38 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		100F54071614DF7300FD5EB8 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Generate the headers\nbuild/build.sh -v public_headers";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
-		1090C531161275BF0054B040 /* Sources */ = {
+		100F54501614E2C000FD5EB8 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				10B7616C161276F700B3CD58 /* SFNetworkEngine.m in Sources */,
-				10B7616D161276F700B3CD58 /* SFNetworkOperation.m in Sources */,
-				10B7616E161276F700B3CD58 /* SFNetworkUtils.m in Sources */,
-				10B7617F1612774500B3CD58 /* Reachability.m in Sources */,
+				100F54511614E2CB00FD5EB8 /* SFNetworkEngine.m in Sources */,
+				100F54521614E2CE00FD5EB8 /* SFNetworkOperation.m in Sources */,
+				100F54531614E2D000FD5EB8 /* SFNetworkUtils.m in Sources */,
+				100F54791614EAAA00FD5EB8 /* NSData+Base64.m in Sources */,
+				100F547B1614EAAA00FD5EB8 /* NSDate+RFC1123.m in Sources */,
+				100F547D1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.m in Sources */,
+				100F547F1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.m in Sources */,
+				100F54811614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.m in Sources */,
+				100F54831614EAAA00FD5EB8 /* MKNetworkEngine.m in Sources */,
+				100F54861614EAAA00FD5EB8 /* MKNetworkOperation.m in Sources */,
+				10C7514216151E98008139FD /* Reachability.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,7 +310,15 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/dependencies/SalesforceOAuth-Debug/Headers/**",
+					"$(SRCROOT)/dependencies/SalesforceCommonUtils-Debug/Headers/**",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/dependencies/SalesforceCommonUtils-Debug/Libraries/**",
+					"$(SRCROOT)/dependencies/SalesforceOAuth-Debug/Libraries/**",
+				);
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -268,7 +337,15 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/dependencies/SalesforceOAuth-Release/Headers/**",
+					"$(SRCROOT)/dependencies/SalesforceCommonUtils-Release/Headers/**",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/dependencies/SalesforceCommonUtils-Release/Libraries/**",
+					"$(SRCROOT)/dependencies/SalesforceOAuth-Release/Libraries/**",
+				);
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -280,13 +357,11 @@
 				DSTROOT = /tmp/SalesforceNetworkSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/dependencies/SalesforceOAuth/Libraries\"",
-				);
+				INSTALL_PATH = /Libraries;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
+				PUBLIC_HEADERS_FOLDER_PATH = ../Headers/SalesforceNetworkSDK;
+				SKIP_INSTALL = NO;
 			};
 			name = Debug;
 		};
@@ -296,13 +371,11 @@
 				DSTROOT = /tmp/SalesforceNetworkSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/dependencies/SalesforceOAuth/Libraries\"",
-				);
+				INSTALL_PATH = /Libraries;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
+				PUBLIC_HEADERS_FOLDER_PATH = ../Headers/SalesforceNetworkSDK;
+				SKIP_INSTALL = NO;
 			};
 			name = Release;
 		};

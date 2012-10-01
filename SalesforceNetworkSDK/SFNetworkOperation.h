@@ -27,46 +27,82 @@ typedef void (^SFNetworkOperationErrorBlock)(NSError* error);
  
  `SFNetworkEngine` should be used to create instance of `SFNetworkOperation`
  */
-@interface SFNetworkOperation : NSOperation 
+@interface SFNetworkOperation : NSOperation
 
-/**Set custom tag on `SFNetworkOperation`
+/**Custom tag for this operation
  
-Tag can be used to categorize `SFNetworkOperation` and used together with `[SFNetworkEngine hasPendingOperationsWithTag]`
+ Tag can be used to categorize `SFNetworkOperation` and used together with `[SFNetworkEngine hasPendingOperationsWithTag]`
  */
 @property (nonatomic, strong) NSString *tag;
-@property (nonatomic, readonly) NSString *url;
+
+/**Expected download size
+ 
+ Set this property to the expected download size when running a SFNetworkOperation for downloading a binary content. If this property is not set, `SFNetworkOperation` will rely on the "Content-Length" in response header to properly invoke the `SFNetworkOperationProgressBlock` download progress block
+ 
+ As of 180 release, salesforce content download API does not set "Content-Length" response header properly,  make sure set this property before start a download operation
+ */
 @property (nonatomic, assign) NSUInteger expectedDownloadSize;
 
+/** Network timeout setting in seconds. Default value is 180 seconds
+ */
+@property (nonatomic, assign) NSTimeInterval operationTimeout;
+
+/** Request URL Property
+ */
+@property (nonatomic, readonly, strong) NSString *url;
+
+/** If the operation results in an error, this will hold the response error, otherwise it will be nil */
 @property (nonatomic, readonly, strong) NSError *error;
+
+/** Returns the operation response's status code.
+ 
+ Returns 0 when the operation has not yet started and the response is not available.
+ */
 @property (nonatomic, readonly, assign) NSInteger statusCode;
+
+/** Returns an uniqueIdentifer for this operation
+ 
+ uniqueIdentifier is generated based on operation's method, url and parameters*/
 @property (nonatomic, readonly, strong) NSString *uniqueIdentifier;
 
 /**Delegate can be used to monitor operation status (complete, error, cancel or timeout) in lieu of using blocks
  */
 @property (nonatomic, weak) id <SFNetworkOperationDelegate> delegate;
 
-/**Set to YES if want to encrypt downloaded content. Default value is YES*/
+/**Set to YES to encrypt all downloaded content. Default value is YES*/
 @property (nonatomic, assign) BOOL encryptDownloadedFile;
 
-/**Set to YES if want operation requires access token. Default value is YES*/
+/**Set to YES if the operation requires an access token. Default value is YES*/
 @property (nonatomic, assign) BOOL requiresAccessToken;
 
 /** Custom HTTP headers that will be used by this operation
  
- @param customHeaders Value specified by this parameter will override value set by `[SFNetworkEngine customHeaders]`
+ CustomHeaders Value specified by this parameter will override value set by `[SFNetworkEngine customHeaders]`
  */
-- (void)customHeaders:(NSDictionary *)customHeaders;
+@property (nonatomic, strong) NSDictionary *customHeaders;
 
-///---------------------------------------------------------------
-/// @name Upload and Download Methods
-///---------------------------------------------------------------
-/**Set path for the download file 
+/**Set path to store downloaded content
  
- @param downloadFilePath Path to store downloaded content. If this value is set and `encryptDownloadedFile` is set to true, all content downloaded by this operation will be encrypted and stored in the file specified by the path
+Path to store downloaded content. If this value is set, all content downloaded by this operation will be stored at the path specified. And  if `encryptDownloadedFile` is set to true, file content will be encrypted
  */
-- (void)downloadFile:(NSString *)downloadFilePath;
+@property (nonatomic, strong) NSString *pathToStoreDownloadedContent;
 
-/**  Attach a file data as multi-form post data to this operation
+
+/** Set value for the specified HTTP header
+ 
+ @param value Header value. If value is nil, this method will remove value for the specified key from the headers
+ @param key Header key
+ */
+- (void)setHeaderValue:(NSString *)value forKey:(NSString *)key;
+
+/**Cache policy for this operation. Default value is NSURLRequestReloadIgnoringLocalCacheData*/
+@property (nonatomic, assign) NSURLRequestCachePolicy cachePolicy;
+
+
+///---------------------------------------------------------------
+/// @name Method for File Upload
+///---------------------------------------------------------------
+/** Attach file data as multipart/​form POST data
  
  This method can be used to upload binary file. A multi-part form data will be constructured based on the value passed in with format
  
@@ -76,40 +112,46 @@ Tag can be used to categorize `SFNetworkOperation` and used together with `[SFNe
  `fileData`
  
  @param fileData File raw data
- @param paramName Parameter name to be used in the multi-part form data for this file. Nil is accepted
+ @param paramName Parameter name to be used in the multi-part form data for this file. nil is accepted
  @param fileName File name to be used in the multi-part form data for this file
  @param mimeType File mimetype. Nil is accpeted. If nil is passed, 'multipart/form-data' will be used by default as the mimetype. Server side will use the fileName to figure out the proper mimetype for the file
  */
--(void)addPostFileData:(NSData *)fileData paramName:(NSString *)paramName fileName:(NSString *)fileName mimeType:(NSString *)mimeType;
+- (void)addPostFileData:(NSData *)fileData paramName:(NSString *)paramName fileName:(NSString *)fileName mimeType:(NSString *)mimeType;
 
 ///---------------------------------------------------------------
 /// @name Block Methods
 ///---------------------------------------------------------------
-/** Add block Handler for completion, error and cancel
+/** Add block Handler for completion
  
- An operation can have multiple completion, error and cancel blocks attached to it. Upon completion, error or error, each registered block will be executed
+ An operation can have multiple completion and error blocks attached to it. 
+ When the operation completes successfully each registered completion block will be executed on a background thread.
+ When operation errors out or operation response contains single JSON array with errorCode, each registered error block will be executed on a background thread
  @param completionBlock Completion block to be invoked when operation is completed successfully
- @param errorBlock Error block to be invoked when operation errors out
- @param cancelBlock Cancel block to be invoked when operation is canceld
- @param callOnMainThread Set to YES to run block call block on main thread
  */
-- (void)onCompletion:(SFNetworkOperationCompletionBlock)completionBlock onError:(SFNetworkOperationErrorBlock)errorBlock onCancel:(SFNetworkOperationCancelBlock)cancelBlock callOnMainThread:(BOOL)callOnMainThread;
+- (void)onCompletion:(SFNetworkOperationCompletionBlock)completionBlock onError:(SFNetworkOperationErrorBlock)errorBlock;
+
+
+/** Add block Handler for cancel
+ 
+ An operation can have multiple cancel blocks attached to it. When an operation is cancelled each registered block will be executed on a background thread. 
+ @param cancelBlock Error block to be invoked when operation is cancelled
+ */
+- (void)onCancel:(SFNetworkOperationCancelBlock)cancelBlock;
+
 
 /** Add Block Handler for tracking upload progress
  
- An operation can have multiple upload progress blocks and error blocks attached to it. Upon upload progress change, each uploadProgressBlock will be executed
+ An operation can have multiple upload progress blocks attached to it. When upload process changes each registered block will be executed on a background thread
  @param uploadProgressBlock Block to be invoked when upload progress is changed
- @param callOnMainThread Set to YES to run block call block on main thread
  */
-- (void)onUploadProgressChanged:(SFNetworkOperationProgressBlock)uploadProgressBlock callOnMainThread:(BOOL)callOnMainThread;
+- (void)onUploadProgressChanged:(SFNetworkOperationProgressBlock)uploadProgressBlock;
 
 /** Add Block Handler for tracking download progress
  
- An operation can have multiple download progress blocks and error blocks attached to it. Upon upload progress change, each downloadProgressBlock will be executed
+ An operation can have multiple download progress blocks attached to it. When download process changes each registered block will be executed on a background thread
  @param downloadProgressBlock Block to be invoked when download progress is changed
- @param callOnMainThread Set to YES to run block call block on main thread
  */
-- (void)onDownloadProgressChanged:(SFNetworkOperationProgressBlock)downloadProgressBlock callOnMainThread:(BOOL)callOnMainThread;
+- (void)onDownloadProgressChanged:(SFNetworkOperationProgressBlock)downloadProgressBlock;
 
 
 ///---------------------------------------------------------------
