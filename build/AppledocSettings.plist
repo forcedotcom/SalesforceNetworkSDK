@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" 
+        "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>--ignore</key>
+        <array>
+                <string>ThirdParty</string>
+                <string>Libraries</string>
+                <string>Frameworks</string>
+                <string>Testing</string>
+        </array>
+        <key>--output</key>
+        <string>./helpdocs</string>
+        <key>--project-company</key>
+        <string>Salesforce.com</string>
+        <key>--company-id</key>
+        <string>com.salesforce</string>
+        <key>--docset-desc</key>
+        <string>Salesforce.com Network SDK documentation</string>
+        <key>--explicit-crossref</key>
+        <false/>
+        <key>--warn-empty-description</key>
+        <true/>
+        <key>--warn-invalid-crossref</key>
+        <true/>
+        <key>--warn-missing-arg</key>
+        <true/>
+        <key>--warn-invalid-crossref</key>
+        <true/>
+        <key>--create-docset</key>
+        <true/>
+        <key>--publish-docset</key>
+        <false/>
+        <key>--install-docset</key>
+        <false/>
+        <key>--keep-intermediate-files</key>
+        <true/>
+        <key>--logformat</key>
+        <string>xcode</string>
+        <key>--merge-categories</key>
+        <true/>
+        <key>--project-name</key>
+        <string>SalesforceNetworkSDK</string>
+        <key>--verbose</key>
+        <integer>4</integer>
+        <key>--logformat</key>
+        <integer>1</integer>
+</dict>
+</plist>
+

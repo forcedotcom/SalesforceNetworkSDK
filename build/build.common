@@ -1,0 +1,112 @@
+#!/bin/bash
+# This script provides common functions for use in the build.sh script
+
+SHOW_COLOR=NO
+if [[ -n $TERM && -t 1 ]]; then
+    SHOW_COLOR=YES
+fi
+
+clr() {
+  [[ $SHOW_COLOR = "YES" ]] && tput $*
+}
+
+error() {
+    echo $(clr setaf 1)[ ERROR ] $*$(clr sgr0) >&2
+}
+
+info() {
+    [ $OPT_VERBOSE ] && echo $(clr setaf 2)[ INFO  ] $*$(clr sgr0) >&2
+}
+
+warn() {
+    [ $OPT_VERBOSE ] && echo $(clr setaf 3)[ WARN  ] $*$(clr sgr0) >&2
+}
+
+sigint_handler () {
+    echo "error code"
+    errcode=$? # save the exit code as the first thing done in the trap function
+    error "Script $0 failed with code $errcode"
+
+    error "The command executing at the time of the error was:"
+    error "    $BASH_COMMAND"
+    error "on line ${BASH_LINENO[0]}"
+
+    exit $errcode
+}
+trap sigint_handler ERR
+
+# Usage: start_logging [delete_existing_logfile]
+start_logging() {
+  # Check to see if OUTPUT_LOG and OUTPUT_PIPE need to be defined.
+  if [ -z "$OUTPUT_PIPE" ]; then
+    template="$(basename $0)$BUILD_TAG.XXXXX.pipe"
+    OUTPUT_PIPE=`mktemp -t "${template}"`
+  fi
+  # Make sure that we're not already logging.
+  if [ -n "$OUTPUT_PID" ]; then
+    error "Logging already started!"
+    return 1
+  fi
+
+  # Always remove the log and pipe first.
+  rm -f $OUTPUT_PIPE
+  # Delete the logfile first if told to.
+  if [ "$1" = 'yes' ]; then
+    rm -f $OPT_LOGFILE
+  fi
+
+  mkfifo $OUTPUT_PIPE
+  tee -a $OPT_LOGFILE < $OUTPUT_PIPE &
+  OUTPUT_PID=$!
+
+  exec 3>&1 4>&2 >$OUTPUT_PIPE 2>&1
+}
+
+stop_logging() {
+  # Make sure that we're currently logging.
+  if [ -z "$OUTPUT_PID" ]; then
+    error "Logging not yet started!"
+    return 1
+  fi
+  exec 1>&3 3>&- 2>&4 4>&-
+  wait $OUTPUT_PID
+  rm -f $OUTPUT_PIPE
+  unset OUTPUT_PID
+}
+
+xpath_attributes() {
+    local url=$1; shift
+    local xpathArg=$1; shift
+
+    curl -s "$url/api/xml" | xpath "$xpathArg" 2>&1 | grep -Eav '^(No nodes|Found)' | \
+        sed -e 's/^[ \t]*//' | sed -e 's/-- NODE --//g' | sed -e "s/^Query didn't return a nodeset. Value: //" | \
+        grep -Ev '^$'
+}
+
+downloadJenkinsDependencies() {
+    local url=$1
+    info "Checking dependencies for $(xpath_attributes "$url" '//displayName/text()')"
+    
+    for upstreamURL in $(xpath_attributes "$url" '//upstreamProject/url/text()'); do
+        local lastBuild=$(xpath_attributes "$upstreamURL" '//lastSuccessfulBuild/url/text()')
+        local lastBuildTimestamp=$(xpath_attributes "$lastBuild" '//timestamp/text()')
+
+        for zipArtifact in $(xpath_attributes "$lastBuild" '//artifact[contains(fileName, "zip")]/relativePath/text()'); do
+            local artifactURL="$lastBuild/artifact/$zipArtifact"
+            local artifactFilename=$(basename $zipArtifact)
+            if [[ -f $DEPENDENCIES/$artifactFilename && $(stat -f %m $DEPENDENCIES/$artifactFilename) > $lastBuildTimestamp ]]; then
+                warn "Skipping $artifactFilename since it isn't newer than $DEPENDENCIES/$artifactFilename"
+            else
+                info "Downloading $artifactURL"
+                curl -o $DEPENDENCIES/$artifactFilename $artifactURL 
+                local artifactFileComponent=$(basename -s .zip $artifactFilename)
+                rm -rf $DEPENDENCIES/$artifactFileComponent
+                unzip -q -d $DEPENDENCIES $DEPENDENCIES/$artifactFilename
+            fi
+        done
+
+        # Recurse into that job's upstream jobs
+        downloadJenkinsDependencies $upstreamURL
+    done
+}
+
