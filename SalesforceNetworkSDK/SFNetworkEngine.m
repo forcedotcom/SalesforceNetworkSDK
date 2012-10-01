@@ -78,6 +78,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
+
 + (SFNetworkEngine *)sharedInstance {
     static dispatch_once_t pred;
     static SFNetworkEngine *networkEngine = nil;
@@ -113,12 +114,14 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         [self internalNetworkEngine];
     }
 }
+
 - (void)setCustomHeaders:(NSDictionary *)customHeaders {
     _customHeaders = customHeaders;
     if (_internalNetworkEngine) {
         [_internalNetworkEngine updateCustomHeaders:_customHeaders];
     }
 }
+
 - (NSDictionary *)customHeaders {
     if (_customHeaders) {
         return _customHeaders;
@@ -127,6 +130,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         return [self defaultCustomHeaders];
     }
 }
+
 - (MKNetworkEngine *)internalNetworkEngine {
     if (!_internalNetworkEngine) {
         //Assert the condition that has to be met
@@ -196,6 +200,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
 - (SFNetworkOperation *)operationWithUrl:(NSString *)url params:(NSDictionary *)params httpMethod:(NSString *)method {
     return [self operationWithUrl:url params:params httpMethod:method ssl:YES];
 }
+
 - (SFNetworkOperation *)get:(NSString *)url params:(NSDictionary *)params {
     return [self operationWithUrl:url params:params httpMethod:SFNetworkOperationGetMethod ssl:YES];
 }
@@ -210,6 +215,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
 - (SFNetworkOperation *)delete:(NSString *)url params:(NSDictionary *)params {
     return [self operationWithUrl:url params:params httpMethod:SFNetworkOperationDeleteMethod ssl:YES];
 }
+
 - (SFNetworkOperation *)patch:(NSString *)url params:(NSDictionary *)params {
     return [self operationWithUrl:url params:params httpMethod:SFNetworkOperationPatchMethod ssl:YES];
 }
@@ -315,6 +321,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         }
     }
 }
+
 #pragma mark - Private Method
 /** Return YES when coordinator has changed 
  
@@ -388,7 +395,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
 #pragma mark - Life Cycle Notification Methods
 - (void)appEnteredBackground:(NSNotification *)notification {
     if (self.shouldSuspendRequestsWhenAppEntersBackground) {
-        [self cancelAllOperations];
+        [self suspendAllOperations];
     }
 }
 - (void)appBecomeActive:(NSNotification *)notification {
@@ -433,6 +440,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         }
     }
 }
+
 - (void)refreshAccessTokenFlowStopped:(BOOL)willAutoRetryRefreshFlow {
     @synchronized(self) {
         _accessTokenBeingRefreshed = NO;
@@ -445,6 +453,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         }
     }
 }
+
 - (void)queueOperationOnExpiredAccessToken:(SFNetworkOperation *)operation {
     if (nil == operation) {
         return;

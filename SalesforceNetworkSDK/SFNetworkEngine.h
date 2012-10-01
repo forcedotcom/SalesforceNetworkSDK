@@ -83,7 +83,7 @@ extern NSString const *SFNetworkOperationEngineResumedNotification;
  */
 @property (nonatomic, assign) BOOL enableHttpPipeling;
 
-/**Set to true to suspsend all pending requests when app enters background. Default is YES*/
+/**Set to true to suspend all pending requests when app enters background. Default is YES*/
 @property (nonatomic, assign, getter = shouldSuspendRequestsWhenAppEntersBackground) BOOL suspendRequestsWhenAppEntersBackground;
 
 /** Returns the singleton instance of `SFNetworkEngine`
