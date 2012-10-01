@@ -100,12 +100,12 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
 
 #pragma mark - Property Override
 - (void)setCoordinator:(SFOAuthCoordinator *)coordinator {
-    if (self.internalNetworkEngine) {
+    if (_internalNetworkEngine) {
         //network engine created before
         if ([self needToRecreateNetworkEngine:coordinator]) {
             [self cleanup];
         }
-        self.internalNetworkEngine = nil;
+        _internalNetworkEngine = nil;
     }
     _coordinator = coordinator;
     if (!_internalNetworkEngine) {
@@ -119,6 +119,14 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         [_internalNetworkEngine updateCustomHeaders:_customHeaders];
     }
 }
+- (NSDictionary *)customHeaders {
+    if (_customHeaders) {
+        return _customHeaders;
+    }
+    else {
+        return [self defaultCustomHeaders];
+    }
+}
 - (MKNetworkEngine *)internalNetworkEngine {
     if (!_internalNetworkEngine) {
         //Assert the condition that has to be met
@@ -128,7 +136,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         NSString *currentHostName = [credentials.instanceUrl host];
         
         
-        _internalNetworkEngine = [[MKNetworkEngine alloc] initWithHostName:currentHostName customHeaderFields:[self defaultCustomHeaders]];
+        _internalNetworkEngine = [[MKNetworkEngine alloc] initWithHostName:currentHostName customHeaderFields:[self customHeaders]];
         
         __weak SFNetworkEngine *weakSelf = self;
         _internalNetworkEngine.reachabilityChangedHandler =  ^ (NetworkStatus ns) {
@@ -168,19 +176,20 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
     NSString *lowerCaseUrl = [url lowercaseString];
     if (![lowerCaseUrl hasPrefix:@"http:"] && ![lowerCaseUrl hasPrefix:@"https:"]) {
         //relative URL, construct full URL
-        if ([NSString isEmpty:self.apiPath]) {
+        //If API path is nil or URL already starts with API path, construct with instanceUrl only
+        if ([NSString isEmpty:self.apiPath] || [lowerCaseUrl hasPrefix:[self.apiPath lowercaseString]]) {
             url = [NSString stringWithFormat:@"%@/%@", self.coordinator.credentials.instanceUrl, url];
         }
         else {
             url = [NSString stringWithFormat:@"%@/%@/%@", self.coordinator.credentials.instanceUrl, self.apiPath, url];
         }
     }
-    MKNetworkOperation *internalOperation = [engine operationWithPath:url params:[NSMutableDictionary dictionaryWithDictionary:params] httpMethod:method ssl:useSSL];
+    MKNetworkOperation *internalOperation = [engine operationWithURLString:url params:[NSMutableDictionary dictionaryWithDictionary:params] httpMethod:method];
     internalOperation.enableHttpPipelining = self.enableHttpPipeling;
     
     SFNetworkOperation *operation = [[SFNetworkOperation alloc] initWithOperation:internalOperation];
     operation.operationTimeout = self.operationTimeout;
-    operation.customHeaders = [self customHeaders];
+    operation.customHeaders = self.customHeaders;
     return operation;
 }
 
@@ -234,7 +243,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
 }
 
 - (void)enqueueOperation:(SFNetworkOperation*)operation {
-    if (operation == nil || operation.internalOperation) {
+    if (nil == operation || nil == operation.internalOperation) {
         return;
     }
     

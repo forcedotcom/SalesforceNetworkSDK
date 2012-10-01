@@ -13,7 +13,7 @@ typedef void (^SFNetworkOperationProgressBlock)(double progress);
 typedef void (^SFNetworkOperationCompletionBlock)(SFNetworkOperation* operation);
 typedef void (^SFNetworkOperationCancelBlock)(SFNetworkOperation* operation);
 typedef void (^SFNetworkOperationErrorBlock)(NSError* error);
-
+typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict);
 @protocol SFNetworkOperationDelegate <NSObject>
 
 @optional
@@ -98,6 +98,15 @@ Path to store downloaded content. If this value is set, all content downloaded b
 /**Cache policy for this operation. Default value is NSURLRequestReloadIgnoringLocalCacheData*/
 @property (nonatomic, assign) NSURLRequestCachePolicy cachePolicy;
 
+///---------------------------------------------------------------
+/// @name Post Method
+///---------------------------------------------------------------
+/** Set custom customized post data encoding support
+ 
+ @param postDataEncodingHandler Block to be invoked when your HTTP Method is POST or PUT to translate request body into a custom string representation
+ @param contentType Content type for the translated body content. For example, if your `postDataEncodingHandler` translates request body to JSON format, you will need to set contentType to "application/json"
+ */
+-(void)setCustomPostDataEncodingHandler:(SFNetworkOperationEncodingBlock) postDataEncodingHandler forType:(NSString*)contentType;
 
 ///---------------------------------------------------------------
 /// @name Method for File Upload

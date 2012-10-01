@@ -115,7 +115,14 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return nil;
     }
 }
-
+- (NSString *)description {
+    if (_internalOperation) {
+        return [_internalOperation curlCommandLineString];
+    }
+    else {
+        return @"";
+    }
+}
 - (void)setOperationTimeout:(NSTimeInterval)operationTimeout {
     _operationTimeout = operationTimeout;
     if (_internalOperation) {
@@ -138,6 +145,13 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     _pathToStoreDownloadedContent = pathToStoreDownloadedContent;
     if (_internalOperation) {
         _internalOperation.downloadFile = pathToStoreDownloadedContent;
+    }
+}
+
+- (void)setExpectedDownloadSize:(NSUInteger)expectedDownloadSize {
+    _expectedDownloadSize = expectedDownloadSize;
+    if (_internalOperation) {
+        _internalOperation.expectedContentSize = expectedDownloadSize;
     }
 }
 
@@ -201,6 +215,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
 }
 
+-(void)setCustomPostDataEncodingHandler:(SFNetworkOperationEncodingBlock) postDataEncodingHandler forType:(NSString*)contentType {
+    if (_internalOperation) {
+        [_internalOperation setCustomPostDataEncodingHandler:postDataEncodingHandler forType:contentType];
+    }
+}
 #pragma mark - Block Methods
 - (void)onCompletion:(SFNetworkOperationCompletionBlock)completionBlock onError:(SFNetworkOperationErrorBlock)errorBlock{
     if (_internalOperation) {
@@ -358,6 +377,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 #pragma mark - Error Methods
 //Check to if an operation's json response contains error code 
 - (NSError *)checkForErrorInResponse:(MKNetworkOperation *)operation {
+    NSString *responseStr = [operation responseString];
+    if (nil == responseStr || ![responseStr hasPrefix:@"{"] || ![responseStr hasPrefix:@"["]) {
+        //Not JSON format
+        return nil;
+    }
     id jsonResponse = [operation responseJSON];
     if (jsonResponse && [jsonResponse isKindOfClass:[NSArray class]]) {
         if ([jsonResponse count] == 1) {

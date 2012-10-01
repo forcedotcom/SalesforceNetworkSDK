@@ -19,7 +19,7 @@ DISTRIBUTION_PATH=$PWD/../../distribution
 [ -z $INSTALL_PATH ] || INSTALL_PATH=$PWD/artifacts
 
 PROJ=../$PROJECT_NAME.xcodeproj
-OPT_JOBURL="http://mobile-iosbuild1-1-sfm.ops.sfdc.net/hudson/job/Salesforce-iOS-NetworkSDK"
+OPT_JOBURL="http://mobile-iosbuild1-1-sfm.ops.sfdc.net/jenkins/job/Salesforce-iOS-NetworkSDK"
 OPT_VERBOSE=1
 declare readonly DEPENDENCIES="$SCRIPT_ROOT/dependencies"
 
@@ -134,13 +134,13 @@ function main() {
 
     local args="$*"
     if [[ $args =~ all ]] ; then
-        args="debug release thin"
+        args="dependencies debug release thin"
     fi
     
     if [[ $args =~ dependencies ]]; then
         if [[ -z $OPT_JOBURL ]] ; then
             if [[ -n $OPT_BRANCH ]] ; then
-                local testURL="http://mobile-iosbuild1-1-sfm.ops.sfdc.net/hudson/job/Salesforce-iOS-NetworkSDK"
+                local testURL="http://mobile-iosbuild1-1-sfm.ops.sfdc.net/jenkins/job/Salesforce-iOS-NetworkSDK"
                 if [[ $(curl -Is -w "%{http_code}" -o/dev/null $testURL) -eq 200 ]]; then
                     info "No job URL supplied, but guessed it is $testURL"
                     OPT_JOBURL=$testURL

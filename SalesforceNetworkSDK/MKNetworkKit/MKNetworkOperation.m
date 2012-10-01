@@ -149,25 +149,7 @@
 @synthesize cachePolicy = _cachePolicy;
 @synthesize requiresAccessToken = _requiresAccessToken;
 @synthesize enableHttpPipelining = _enableHttpPipelining;
-static BOOL isSingleCore;
-+ (void)initialize {
-    UIDevicePlatform devicePlatform = [[UIDevice currentDevice] platformType];
-    if ( devicePlatform == UIDevice1GiPad
-        || devicePlatform == UIDevice4iPhone
-        || devicePlatform == UIDevice3GSiPhone
-        || devicePlatform == UIDevice3GiPhone
-        || devicePlatform == UIDevice1GiPhone
-        || devicePlatform == UIDevice3GiPod
-        || devicePlatform == UIDevice2GiPod
-        || devicePlatform == UIDevice1GiPod
-        || devicePlatform == UIDevice1GiPod
-        ){
-        isSingleCore = YES;
-    }
-    else {
-        isSingleCore = NO;
-    }
-}
+
 // A RESTful service should always return the same response for a given URL and it's parameters.
 // this means if these values are correct, you can cache the responses
 // This is another reason why we check only GET methods.
@@ -1350,16 +1332,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
 
 #if TARGET_OS_IPHONE
 -(UIImage*) responseImage {
-    if (isSingleCore) {
-        //Salesforce Customization to force synchronized processing of image
-        //for single core system
-        @synchronized([MKNetworkOperation class]) {
-            return [UIImage imageWithData:[self responseData]];
-        }
-    }
-    else {
-        return [UIImage imageWithData:[self responseData]];
-    }
+    return [UIImage imageWithData:[self responseData]];
 }
 #elif TARGET_OS_MAC
 -(NSImage*) responseImage {
