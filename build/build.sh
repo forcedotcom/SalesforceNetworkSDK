@@ -21,7 +21,7 @@ DISTRIBUTION_PATH=$PWD/../../distribution
 PROJ=../$PROJECT_NAME.xcodeproj
 OPT_JOBURL="http://mobile-iosbuild1-1-sfm.ops.sfdc.net/jenkins/job/Salesforce-iOS-NetworkSDK"
 OPT_VERBOSE=1
-declare readonly DEPENDENCIES="$SCRIPT_ROOT/dependencies"
+declare readonly DEPENDENCIES="$SCRIPT_ROOT/../dependencies"
 
 function build_combined() {
 	local configuration="$1"; shift

@@ -22,6 +22,8 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 @synthesize tag = _tag;
 @synthesize expectedDownloadSize = _expectedDownloadSize;
 @synthesize operationTimeout = _operationTimeout;
+@synthesize useSSL = _useSSL;
+@synthesize method = _method;
 @synthesize url = _url;
 @synthesize error = _error;
 @synthesize statusCode = _statusCode;
@@ -35,11 +37,14 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 @synthesize cancelBlocks = _cancelBlocks;
 
 #pragma mark - Initialize Method
-- (id)initWithOperation:(MKNetworkOperation *)operation {
+- (id)initWithOperation:(MKNetworkOperation *)operation url:(NSString *)url method:(NSString *)method ssl:(BOOL)useSSL {
     self = [super init];
     if (self) {
         _internalOperation = operation;
         _cancelBlocks = [[NSMutableArray alloc] init];
+        _useSSL = useSSL;
+        _method = method;
+        _url = url;
         
         //set default values
         self.encryptDownloadedFile = YES;
@@ -64,7 +69,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     if (nil == _internalOperation) {
         return;
     }
-    if (nil != value) {
+    
+    if (nil != value && nil != key) {
+        NSMutableDictionary *mutableHeaders = [NSMutableDictionary dictionaryWithDictionary:[self customHeaders]];
+        [mutableHeaders setValue:value forKey:key];
+        self.customHeaders = mutableHeaders;
         [_internalOperation setHeaderValue:value forKey:key];
     }
 }
@@ -82,14 +91,6 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return YES;
     }
     return NO;
-}
-- (NSString *)url {
-    if (_internalOperation) {
-        return [_internalOperation url];
-    }
-    else {
-        return nil;
-    }
 }
 - (NSError *)error {
     if (_internalOperation) {
@@ -180,6 +181,14 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             });
         }
     }
+    
+    //Locate existing operations that are already in the queue
+    MKNetworkEngine *engine = [[SFNetworkEngine sharedInstance] internalNetworkEngine];
+    for (MKNetworkOperation *operation in  engine.operations) {
+        if ([[operation uniqueIdentifier] isEqualToString:[_internalOperation uniqueIdentifier]] && !operation.isFinished) {
+            [operation cancel];
+        }
+    }
 }
 - (void)setQueuePriority:(NSOperationQueuePriority)p {
     [super setQueuePriority:p];
@@ -215,15 +224,17 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
 }
 
--(void)setCustomPostDataEncodingHandler:(SFNetworkOperationEncodingBlock) postDataEncodingHandler forType:(NSString*)contentType {
+-(void)setCustomPostDataEncodingHandler:(SFNetworkOperationEncodingBlock)postDataEncodingHandler forType:(NSString*)contentType {
+    _customPostDataEncodingContentType = contentType;
     if (_internalOperation) {
         [_internalOperation setCustomPostDataEncodingHandler:postDataEncodingHandler forType:contentType];
     }
 }
+
 #pragma mark - Block Methods
 - (void)onCompletion:(SFNetworkOperationCompletionBlock)completionBlock onError:(SFNetworkOperationErrorBlock)errorBlock{
     if (_internalOperation) {
-        __weak SFNetworkOperation *weakSelf = self;    
+        __weak SFNetworkOperation *weakSelf = self;
         [_internalOperation onCompletion:^(MKNetworkOperation *completedOperation) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                 //Perform all callbacks in background queue
@@ -237,10 +248,19 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                     completionBlock(weakSelf);
                 };
             });
-       } onError:^(NSError *error) {
-           if (weakSelf.requiresAccessToken && [SFNetworkUtils isSessionTimeOutError:error]) {
-               [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:[weakSelf copy]];
-           } else if (errorBlock) {
+        } onError:^(NSError *error) {
+            if (weakSelf.requiresAccessToken && [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeSessionTimeOut) {
+                //do nothing, queueOperationOnExpiredAccessToken is handled in callDelegateDidFailWithError
+                [self log:SFLogLevelError msg:@"Session time out encountered"];
+            } else if (errorBlock) {
+                if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
+                    //Permission denied error
+                    NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
+                    if (potentialError) {
+                        error = potentialError;
+                    }
+                }
+                
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     errorBlock(error);
                 });
@@ -343,14 +363,32 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
 }
 - (void)callDelegateDidFailWithError:(NSError *)error {
+    [self log:SFLogLevelError format:@"callDelegateDidFailWithError %@", error];
     __weak SFNetworkOperation *weakSelf = self;
     if (nil != error) {
-        if (weakSelf.requiresAccessToken && [SFNetworkUtils isSessionTimeOutError:error]) {
-            [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:[weakSelf copy]];
+        if (nil != self.pathToStoreDownloadedContent) {
+            //Download failed, remove the file if it exists to prevent partial file content
+            NSFileManager *fileManager = [NSFileManager defaultManager];
+            if ([fileManager fileExistsAtPath:self.pathToStoreDownloadedContent]) {
+                [fileManager removeItemAtPath:self.pathToStoreDownloadedContent error:nil];
+            }
+        }
+    }
+    if (nil != error) {
+        if (weakSelf.requiresAccessToken && [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeSessionTimeOut) {
+            [self log:SFLogLevelError msg:@"Session time out encountered"];
+            [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:weakSelf];
             return;
         }
     }
     if (nil != error && weakSelf.delegate) {
+        if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
+            //Permission denied error
+            NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
+            if (potentialError) {
+                error = potentialError;
+            }
+        }
         if (error.code == kCFURLErrorTimedOut) {
             if ([weakSelf.delegate respondsToSelector:@selector(operationDidTimeout:)]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
@@ -375,8 +413,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 }
 
 #pragma mark - Error Methods
-//Check to if an operation's json response contains error code 
+//Check to if an operation's json response contains error code
 - (NSError *)checkForErrorInResponse:(MKNetworkOperation *)operation {
+    if (nil != operation) {
+        return nil;
+    }
     NSString *responseStr = [operation responseString];
     if (nil == responseStr || ![responseStr hasPrefix:@"{"] || ![responseStr hasPrefix:@"["]) {
         //Not JSON format
@@ -398,5 +439,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
     return nil;
 }
+
+
 
 @end

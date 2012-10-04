@@ -6,6 +6,7 @@
 //  Copyright (c) 2012 salesforce.com. All rights reserved.
 //
 
+#import "Reachability.h"
 #import "SFNetworkEngine.h"
 #import "MKNetworkKit.h"
 #import "SalesforceCommonUtils.h"
@@ -15,27 +16,31 @@
 #import "SFNetworkUtils.h"
 
 #pragma mark - Operation Method
-NSString *SFNetworkOperationGetMethod = @"GET";
-NSString *SFNetworkOperationPostMethod = @"POST";
-NSString *SFNetworkOperationPutMethod = @"PUT";
-NSString *SFNetworkOperationDeleteMethod = @"DELETE";
-NSString *SFNetworkOperationPatchMethod = @"PATCH";
+NSString * const SFNetworkOperationGetMethod = @"GET";
+NSString * const SFNetworkOperationPostMethod = @"POST";
+NSString * const SFNetworkOperationPutMethod = @"PUT";
+NSString * const SFNetworkOperationDeleteMethod = @"DELETE";
+NSString * const SFNetworkOperationPatchMethod = @"PATCH";
 
 #pragma mark - Notification Name
-NSString *SFNetworkOperationReachabilityChangedNotification = @"SFNetworkOperationReachabilityChangedNotification";
-NSString *SFNetworkOperationEngineOperationCancelledNotification = @"SFNetworkOperationEngineOperationCancelledNotification";
-NSString *SFNetworkOperationEngineSuspendedNotification = @"SFNetworkOperationEngineSuspendedNotification";
-NSString *SFNetworkOperationEngineResumedNotification = @"SFNetworkOperationEngineResumedNotification";
+NSString * const SFNetworkOperationReachabilityChangedNotification = @"SFNetworkOperationReachabilityChangedNotification";
+NSString * const SFNetworkOperationEngineOperationCancelledNotification = @"SFNetworkOperationEngineOperationCancelledNotification";
+NSString * const SFNetworkOperationEngineSuspendedNotification = @"SFNetworkOperationEngineSuspendedNotification";
+NSString * const SFNetworkOperationEngineResumedNotification = @"SFNetworkOperationEngineResumedNotification";
 
-static const NSInteger kDefaultTimeOut = 3 * 60; //3 minutes
-static const NSInteger kOAuthErrorCode = 999;
-static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
+static NSInteger const kDefaultTimeOut = 3 * 60; //3 minutes
+static NSInteger const kOAuthErrorCode = 999;
+static NSTimeInterval const kDefaultRetryDelay = 30; //30 seconds
+
+static NSString * const kAuthoriationHeader = @"OAuth %@";
+static NSString * const kAuthoriationHeaderKey = @"Authorization";
 
 @interface SFNetworkEngine  ()
-@property (nonatomic, strong) MKNetworkEngine *internalNetworkEngine;
+
 - (BOOL)needToRecreateNetworkEngine:(SFOAuthCoordinator *)coordinator;
 - (NSDictionary *)defaultCustomHeaders;
 - (void)reachabilityChanged:(NetworkStatus)ns;
+- (BOOL)operationAlreadyInWaitingQueue:(SFNetworkOperation *)operation;
 @end
 
 @implementation SFNetworkEngine
@@ -178,20 +183,28 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         return nil;
     }
     NSString *lowerCaseUrl = [url lowercaseString];
+    
     if (![lowerCaseUrl hasPrefix:@"http:"] && ![lowerCaseUrl hasPrefix:@"https:"]) {
         //relative URL, construct full URL
+        NSString *hostName = [[self.coordinator.credentials instanceUrl] host];
+        NSString *scheme = useSSL ? @"https" : @"http";
+        
         //If API path is nil or URL already starts with API path, construct with instanceUrl only
         if ([NSString isEmpty:self.apiPath] || [lowerCaseUrl hasPrefix:[self.apiPath lowercaseString]]) {
-            url = [NSString stringWithFormat:@"%@/%@", self.coordinator.credentials.instanceUrl, url];
+            url = [NSString stringWithFormat:@"%@://%@/%@", scheme, hostName, url];
         }
         else {
-            url = [NSString stringWithFormat:@"%@/%@/%@", self.coordinator.credentials.instanceUrl, self.apiPath, url];
+            url = [NSString stringWithFormat:@"%@://%@/%@/%@",scheme, hostName, self.apiPath, url];
         }
     }
+    else {
+        useSSL = [lowerCaseUrl hasPrefix:@"https:"];
+    }
+    
     MKNetworkOperation *internalOperation = [engine operationWithURLString:url params:[NSMutableDictionary dictionaryWithDictionary:params] httpMethod:method];
     internalOperation.enableHttpPipelining = self.enableHttpPipeling;
-    
-    SFNetworkOperation *operation = [[SFNetworkOperation alloc] initWithOperation:internalOperation];
+    internalOperation.freezable = NO;
+    SFNetworkOperation *operation = [[SFNetworkOperation alloc] initWithOperation:internalOperation url:url method:method ssl:useSSL];
     operation.operationTimeout = self.operationTimeout;
     operation.customHeaders = self.customHeaders;
     return operation;
@@ -261,9 +274,14 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
             }
         }
     }
+    //Make sure authorization header is up-to-date
+    if (operation.requiresAccessToken) {
+        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, self.coordinator.credentials.accessToken];
+        [operation setHeaderValue:token forKey:kAuthoriationHeaderKey];
+    }
     
     MKNetworkEngine *engine = [self internalNetworkEngine];
-    [engine enqueueOperation:operation.internalOperation];
+    [engine enqueueOperation:operation.internalOperation forceReload:YES];
 }
 
 - (void)cancelAllOperations {
@@ -309,17 +327,20 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
     }
     
     @synchronized(self) {
+        if (!_accessTokenBeingRefreshed) {
+            //If access token is already refreshed
+            return;
+        }
+        
+        _accessTokenBeingRefreshed = NO;
         self.coordinator = coordinator;
         
         //set OAuth token
-        NSString *token = [NSString stringWithFormat:@"OAuth %@", _coordinator.credentials.accessToken];
-        [self setHeaderValue:token forKey:@"Authorization"];
-        
-        if (self.isAccessTokenBeingRefreshed) {
-            _accessTokenBeingRefreshed = NO;
-            [self replayOperationsWaitingForAccessToken];
-        }
+        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, _coordinator.credentials.accessToken];
+        [self setHeaderValue:token forKey:kAuthoriationHeaderKey];
     }
+    
+    [self replayOperationsWaitingForAccessToken];
 }
 
 #pragma mark - Private Method
@@ -374,8 +395,8 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     if (_coordinator) {
         //set OAuth token
-        NSString *token = [NSString stringWithFormat:@"OAuth %@", _coordinator.credentials.accessToken];
-        [headers setValue:token forKey:@"Authorization"];
+        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, _coordinator.credentials.accessToken];
+        [headers setValue:token forKey:kAuthoriationHeaderKey];
     }
     
     [headers setValue:@"gzip" forKey:@"Accept-Encoding"];
@@ -431,6 +452,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
             _accessTokenBeingRefreshed = YES;
             _networkChangeShouldTriggerTokenRefresh = NO;
             self.previousOAuthDelegate = self.coordinator.delegate;
+            self.coordinator.delegate = self;
             
             //start authentication progress to refresh token
             if (self.coordinator.isAuthenticating) {
@@ -459,7 +481,13 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         return;
     }
     [self startRefreshAccessTokenFlow];
-    [self.operationsWaitingForAccessToken addObject:operation];
+    
+    if (![self operationAlreadyInWaitingQueue:operation]) {
+        SFNetworkOperation *newOperation = [self cloneOperation:operation];
+        if (newOperation) {
+            [self.operationsWaitingForAccessToken addObject:newOperation];
+        }
+    }
 }
 
 - (void)replayOperationsWaitingForAccessToken {
@@ -474,6 +502,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
         safeCopy = [self.operationsWaitingForAccessToken copy];
         [self.operationsWaitingForAccessToken removeAllObjects];
     }
+    
     for (SFNetworkOperation *operation in safeCopy) {
         [self enqueueOperation:operation];
     }
@@ -524,16 +553,16 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
     NSLog(@"oauthCoordinatorDidAuthenticate");
     // the token exchange worked.
     
-    //mark the stop of the refrsh access token flow
-    [self refreshAccessTokenFlowStopped:NO];
-    
     //re-set to ensure we are sharing the same coordinator (and update credentials)
     [self accessTokenRefreshed:coordinator];
+    
+    //mark the stop of the refrsh access token flow
+    [self refreshAccessTokenFlowStopped:NO];
 }
 
 - (void)oauthCoordinator:(SFOAuthCoordinator *)coordinator didFailWithError:(NSError *)error {
     NSLog(@"oauthCoordinator:didFailWithError: %@", error);
-    if ([SFNetworkUtils isOAuthError:error]) {
+    if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeOAuthError) {
         //OAuth error occurs
         [self restoreOAuthDelegate];
         [coordinator revokeAuthentication];
@@ -547,7 +576,7 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
     //TDOO: Should it be triggered by reachability
     //Check to see if OAuth failed due to connection error
     @synchronized(self) {
-        self.networkChangeShouldTriggerTokenRefresh = [SFNetworkUtils isNetworkError:error];
+        self.networkChangeShouldTriggerTokenRefresh = [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeNetworkError;
     }
     
     //Schedule to run startRefreshAccessTokenFlow even if network status change can trigger the
@@ -559,5 +588,66 @@ static const NSTimeInterval kDefaultRetryDelay = 30; //30 seconds
     dispatch_after(popTime, dispatch_get_main_queue(), ^{
         [self startRefreshAccessTokenFlow];
     });
+}
+
+- (BOOL)operationAlreadyInWaitingQueue:(SFNetworkOperation *)operation {
+    for (SFNetworkOperation *existingOperation in self.operationsWaitingForAccessToken) {
+        if ([existingOperation isEqual:operation]) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+#pragma mark - Clone Operation
+#pragma mark - Copying Protocol
+- (SFNetworkOperation *)cloneOperation:(SFNetworkOperation *)operation {
+    if (nil == operation) {
+        return nil;
+    }
+    MKNetworkOperation *internalOperation = operation.internalOperation;
+    
+    if (nil == internalOperation) {
+        return nil;
+    }
+    
+    SFNetworkOperation *newOpeartion = [self operationWithUrl:operation.url params:internalOperation.fieldsToBePosted httpMethod:operation.method ssl:operation.useSSL];
+    
+    //Set Headers
+    newOpeartion.customHeaders = operation.customHeaders;
+    newOpeartion.requiresAccessToken = operation.requiresAccessToken;
+    
+    //Clone all properties
+    newOpeartion.queuePriority = operation.queuePriority;
+    newOpeartion.tag = operation.tag;
+    newOpeartion.expectedDownloadSize = operation.expectedDownloadSize;
+    newOpeartion.operationTimeout = operation.operationTimeout;
+    newOpeartion.delegate = operation.delegate;
+    newOpeartion.encryptDownloadedFile = operation.encryptDownloadedFile;
+    newOpeartion.pathToStoreDownloadedContent = operation.pathToStoreDownloadedContent;
+    newOpeartion.cachePolicy = operation.cachePolicy;
+    [newOpeartion.cancelBlocks addObjectsFromArray:operation.cancelBlocks];
+    
+    //Clone all callbacks
+    MKNetworkOperation *newInternalOperation = newOpeartion.internalOperation;
+    [newInternalOperation updateHandlersFromOperation:internalOperation];
+    
+    //Add file data if exists
+    if (internalOperation.dataToBePosted.count > 0) {
+        for (NSDictionary *fileDict in internalOperation.dataToBePosted) {
+            NSString *paramName = [fileDict valueForKey:@"name"];
+            NSString *fileName = [fileDict valueForKey:@"filename"];
+            NSData *fileData = [fileDict objectForKey:@"data"];
+            NSString *mimeType = [fileDict valueForKey:@"mimetype"];
+            [newOpeartion addPostFileData:fileData paramName:paramName fileName:fileName mimeType:mimeType];
+        }
+    }
+    
+    //Clone custom encoding handler
+    if (internalOperation.postDataEncodingHandler) {
+        [newInternalOperation setCustomPostDataEncodingHandler:internalOperation.postDataEncodingHandler forType:operation.customPostDataEncodingContentType];
+    }
+    
+    return newOpeartion;
 }
 @end

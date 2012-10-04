@@ -7,34 +7,40 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Reachability.h"
+
 #import "SFOAuthCoordinator.h"
 #import "SFNetworkOperation.h"
 
+// Salesforce's wrapper around common Reachability NetworkStatus Compatible Names.
+typedef enum {
+	SFNotReachable     = 0,
+	SFReachableViaWiFi = 2,
+	SFReachableViaWWAN = 1
+} SFNetworkStatus;
 
-extern NSString const *SFNetworkOperationGetMethod;
-extern NSString const *SFNetworkOperationPostMethod;
-extern NSString const *SFNetworkOperationPutMethod;
-extern NSString const *SFNetworkOperationDeleteMethod;
-extern NSString const *SFNetworkOperationPatchMethod;
+extern NSString * const SFNetworkOperationGetMethod;
+extern NSString * const SFNetworkOperationPostMethod;
+extern NSString * const SFNetworkOperationPutMethod;
+extern NSString * const SFNetworkOperationDeleteMethod;
+extern NSString * const SFNetworkOperationPatchMethod;
 
 /** Notification that will be posted when SFNetworkEngine detects network change
  
- When posted, `NetworkStatus` will wraped in NSNumber as the `[notification object]
+ When posted, `SFNetworkStatus` will wraped in NSNumber as the `[notification object]
  */
-extern NSString const *SFNetworkOperationReachabilityChangedNotification;
+extern NSString * const SFNetworkOperationReachabilityChangedNotification;
 
 /** Notification that will be posted when SFNetworkEngine cancels all operations
  */
-extern NSString const *SFNetworkOperationEngineOperationCancelledNotification;
+extern NSString * const SFNetworkOperationEngineOperationCancelledNotification;
 
 /** Notification that will be posted when SFNetworkEngine suspends all pending operations
  */
-extern NSString const *SFNetworkOperationEngineSuspendedNotification;
+extern NSString * const SFNetworkOperationEngineSuspendedNotification;
 
 /** Notification that will be posted when SFNetworkEngine starts to resume all operations
  */
-extern NSString const *SFNetworkOperationEngineResumedNotification;
+extern NSString * const SFNetworkOperationEngineResumedNotification;
 
 /**
  Main class used to manage and send `SFNetworkOperation`
@@ -43,7 +49,7 @@ extern NSString const *SFNetworkOperationEngineResumedNotification;
  
  SFNetworkEngine will perform the following task by default
  - Detect duplication request and associate callback blocks for the duplicate operation to the existing operation
- - Monitor network change and publish  a `SFNetworkOperationReachabilityChangedNotification` notification will be posted when reachability changed with `NetworkStatus` wraped in NSNumber as the `[notification object]`
+ - Monitor network change and publish  a `SFNetworkOperationReachabilityChangedNotification` notification will be posted when reachability changed with `SFNetworkStatus` wraped in NSNumber as the `[notification object]`
  - Manange network concurrence based on network type
  - Automatically start background handling for running operation
  - Suspend all pending operations when app enters background and resumes them when app becomes active. Set `suspendRequestsWhenAppEntersBackground` to change this behavior
@@ -67,7 +73,7 @@ extern NSString const *SFNetworkOperationEngineResumedNotification;
  
  if `reachabilityChangedHandler` is not set, caller of SFNetworkEngine can also observe `SFNetworkOperationReachabilityChangedNotification` notification. `SFNetworkEngine` will be posted when reachability changed with `NetworkStatus` wrapped in NSNumber as the `[notification object]`
  */
-@property (nonatomic, copy) void (^reachabilityChangedHandler)(NetworkStatus ns);
+@property (nonatomic, copy) void (^reachabilityChangedHandler)(SFNetworkStatus ns);
 
 /** Server API root path. In the case of salesforce REST API, apiPath could be /services/data/v25.0 etc. 
  
@@ -146,7 +152,7 @@ extern NSString const *SFNetworkOperationEngineResumedNotification;
  */
 - (SFNetworkOperation *)delete:(NSString *)url params:(NSDictionary *)params;
 
-/** Returns a `SFNetworkOperation` that can be used to execute the specified remote call using `SFNetworkOperationDeleteMethod` method under SSL
+/** Returns a `SFNetworkOperation` that can be used to execute the specified remote call using `SFNetworkOperationPathMethod` method under SSL
  
  * @param url Url to the remote service to invoke. If this url is a relative URL, `[[SFOAuthCoordinator credentials] instanceUrl]` will be automatically added to it
  * @param params Key & value pair as request parameters

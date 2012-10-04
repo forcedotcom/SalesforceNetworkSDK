@@ -34,7 +34,7 @@
 		10B761821612775400B3CD58 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761811612775400B3CD58 /* Security.framework */; };
 		10B761841612775C00B3CD58 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761831612775C00B3CD58 /* MobileCoreServices.framework */; };
 		10B761861612776000B3CD58 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761851612776000B3CD58 /* SystemConfiguration.framework */; };
-		10C7514116151E98008139FD /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 10C7513F16151E98008139FD /* Reachability.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		10C7514116151E98008139FD /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 10C7513F16151E98008139FD /* Reachability.h */; settings = {ATTRIBUTES = (); }; };
 		10C7514216151E98008139FD /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 10C7514016151E98008139FD /* Reachability.m */; };
 /* End PBXBuildFile section */
 
@@ -231,7 +231,7 @@
 		1090C52C161275BF0054B040 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0450;
 				ORGANIZATIONNAME = salesforce.com;
 			};
 			buildConfigurationList = 1090C52F161275BF0054B040 /* Build configuration list for PBXProject "SalesforceNetworkSDK" */;

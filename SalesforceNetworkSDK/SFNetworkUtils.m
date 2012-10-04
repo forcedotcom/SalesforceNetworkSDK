@@ -10,6 +10,27 @@
 #import "SalesforceCommonUtils.h"
 #import "SFOAuthCoordinator.h"
 
+@interface SFNetworkUtils ()
+/** Return YES if error is related to network connectivity error
+ 
+ @param error NSError object used to check whether the error is related to network connectivity error
+ */
++ (BOOL)isNetworkError:(NSError *)error;
+
+/** Return YES if error is related to OAuth error
+ 
+ OAuth error should trigger a login progress again
+ @param error NSError object used to check whether the error is related to OAuth error
+ */
++ (BOOL)isOAuthError:(NSError *)error;
+
+/** Return YES if error is related to session timeout
+ 
+ Session timeout error should trigger access token refresh process
+ @param error NSError object used to check whether the error is related to session timeout error
+ */
++ (BOOL)isSessionTimeOutError:(NSError *)error;
+@end
 
 @implementation SFNetworkUtils
 
@@ -51,34 +72,34 @@
     }
 }
 
-+ (NSString *)displayMessageForError:(NSError *)error {
-    NSString *errorMessage = nil;
++ (SFNetworkOperationErrorType)typeOfError:(NSError *)error {
     if (error == nil) {
-        errorMessage = nil;
+        return SFNetworkOperationErrorTypeUnknown;
     }
-    else {
-        if ([[self class] isNetworkError:error]){
-            errorMessage = NSLocalizedString(@"NETWORK_CONNECTION_ERROR", @"connection error");
-        } else if ([[self class] isSessionTimeOutError:error]) {
-            errorMessage = NSLocalizedString(@"SESSION_TIME_OUT", @"session timeout error");
-        }
-        else if (error.code == 403) {
-            errorMessage = NSLocalizedString(@"ACCESS_FORBIDDEN", @"access not allowed error");
-        }
-        else if (error.code == 404) {
-            errorMessage = NSLocalizedString(@"URL_NO_LONGER_EXISTS", @"URL no longer exists error");
-        }
-        else if (error.code == 500) {
-            errorMessage = NSLocalizedString(@"INTERNAL_SERVER_ERROR", @"internal server error");
-        }
-        else if (error.code == 503) {
-            errorMessage = NSLocalizedString(@"API_LIMIT_REACHED", @"API limit error");
-        }
-        else {
-            errorMessage = [error localizedDescription];
-        }
+    if ([[self class] isNetworkError:error]){
+        return SFNetworkOperationErrorTypeNetworkError;
     }
-    
-    return errorMessage;
+    if ([[self class] isOAuthError:error]) {
+        return SFNetworkOperationErrorTypeOAuthError;
+    }
+
+    if ([[self class] isSessionTimeOutError:error]) {
+        return SFNetworkOperationErrorTypeSessionTimeOut;
+    }
+
+    if (error.code == 403) {
+        return SFNetworkOperationErrorTypeAccessDenied;
+    }
+
+    if (error.code == 404) {
+       return SFNetworkOperationErrorTypeURLNoLongerExists;
+    }
+    if (error.code == 500) {
+       return SFNetworkOperationErrorTypeInternalServerError;
+    }
+    if (error.code == 503) {
+        return SFNetworkOperationErrorTypeAPILimitReached;
+    }
+    return SFNetworkOperationErrorTypeUnknown;
 }
 @end

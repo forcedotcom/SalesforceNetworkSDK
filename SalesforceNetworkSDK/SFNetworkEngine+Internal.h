@@ -11,6 +11,9 @@
 #import "SFNetworkEngine.h"
 #import "SFOAuthCoordinator.h"
 @interface SFNetworkEngine () <SFOAuthCoordinatorDelegate>
+
+@property (nonatomic, strong) MKNetworkEngine *internalNetworkEngine;
+
 /** Queue to store all operations queued up due to expired access token
  
  This queue will contain all operations that failed due to expired token and all incoming pending operations that requires access token
@@ -68,4 +71,10 @@
  See `previousOAuthDelegate` for more details
  */
 - (void)restoreOAuthDelegate;
+
+/**Clone an operation. Used to re-queue a failed operation
+ 
+@param operation Existing `SFNetworkOperation` to clone from
+ */
+- (SFNetworkOperation *)cloneOperation:(SFNetworkOperation *)operation;
 @end
