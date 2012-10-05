@@ -55,6 +55,10 @@
 @property (nonatomic, strong) NSData *cachedResponse;
 @property (nonatomic, copy) MKNKResponseBlock cacheHandlingBlock;
 
+
+/**Added by Salesforce to support read from local test data*/
+@property (nonatomic, assign) BOOL readFromLocalData;
+
 #if TARGET_OS_IPHONE
 @property (nonatomic, assign) UIBackgroundTaskIdentifier backgroundTaskId;
 #endif
@@ -136,6 +140,7 @@
 @synthesize cachePolicy = _cachePolicy;
 @synthesize requiresAccessToken = _requiresAccessToken;
 @synthesize enableHttpPipelining = _enableHttpPipelining;
+@synthesize readFromLocalData = _readFromLocalData;
 
 // A RESTful service should always return the same response for a given URL and it's parameters.
 // this means if these values are correct, you can cache the responses
@@ -395,7 +400,9 @@
     self.state = MKNetworkOperationStateReady;
     [encoder encodeInt32:_state forKey:@"state"];
     [encoder encodeBool:self.isCancelled forKey:@"isCancelled"];
-    [encoder encodeObject:self.mutableData forKey:@"mutableData"];
+    if (self.mutableData) {
+        [encoder encodeObject:self.mutableData forKey:@"mutableData"];
+    }
     [encoder encodeInteger:self.downloadedDataSize forKey:@"downloadedDataSize"];
     [encoder encodeObject:self.downloadStreams forKey:@"downloadStreams"];
     //Salesforce - Added by Qingqing to support download file
@@ -865,6 +872,16 @@
 
 - (void) start
 {
+    //Added by Salesforce to support local data reading
+    if (self.readFromLocalData) {
+        if (self.mutableData) {
+            [self operationSucceeded];
+        }
+        else {
+            [self operationFailedWithError:[NSError errorWithDomain:NSURLErrorDomain code:404 userInfo:nil]];
+        }
+        return;
+    }
     
 #if TARGET_OS_IPHONE
     self.backgroundTaskId = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
@@ -1000,7 +1017,10 @@
     
     //Salesforce Customization
     if (nil != self.downloadFile) {
-        [[NSFileManager defaultManager] removeItemAtPath:self.downloadFile error:nil];
+        NSFileManager *fileManager = [NSFileManager defaultManager];
+        if ([fileManager fileExistsAtPath:self.downloadFile]) {
+            [fileManager removeItemAtPath:self.downloadFile error:nil];
+        }
     }
     
     [self operationFailedWithError:error];
@@ -1098,11 +1118,21 @@
     NSUInteger size = sz < 0 ? 0 : sz;
     self.response = (NSHTTPURLResponse*) response;
     
+    //customized by Salesforce
     // dont' save data if the operation was created to download directly to a stream.
-    if(self.downloadFile == nil &&  [self.downloadStreams count] == 0)
+    BOOL needsToCreateMutableData = YES;
+    if ([self.downloadStreams count] > 0) {
+        needsToCreateMutableData = NO;
+    } else if (self.downloadFile != nil && self.encryptDownload) {
+        needsToCreateMutableData = NO;
+    }
+    
+    if(needsToCreateMutableData) {
         self.mutableData = [NSMutableData dataWithCapacity:size];
-    else
+    }
+    else {
         self.mutableData = nil;
+    }
     
     
     //Salesforce Customization
@@ -1179,8 +1209,8 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    // Salesforce
-    if ([self.mutableData length] == 0 || [self.downloadStreams count] > 0) {
+    // Customization by Salesforce
+    if (nil == self.mutableData || (self.mutableData && [self.mutableData length] == 0) || [self.downloadStreams count] > 0) {
         // This is the first batch of data
         // Check for a range header and make changes as neccesary
         NSString *rangeString = [[self request] valueForHTTPHeaderField:@"Range"];
@@ -1193,7 +1223,7 @@
     }
     
     //Salesforce - Added by Qingqing to support download file
-    if(nil == self.downloadFile && [self.downloadStreams count] == 0) {
+    if(nil != self.mutableData) {
         [self.mutableData appendData:data];
     }
     
@@ -1214,7 +1244,7 @@
         if (nil != self.downloadFile) {
             if (self.encryptDownload) {
                 [[self cipher] cryptData:data];
-            } else {
+            } else if (nil != self.mutableData) {
                 [self.mutableData appendData:data];
             }
         }
@@ -1282,7 +1312,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
             if (self.encryptDownload) {
                 [[self cipher] finalizeCipher];
             }
-            else {
+            else if (nil != self.mutableData) {
                 [[self mutableData] writeToFile:self.downloadFile atomically:YES];
             }
         }
@@ -1339,28 +1369,40 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
 }
 
 -(NSString*) responseStringWithEncoding:(NSStringEncoding) encoding {
-    
+    if (nil == [self responseData]) {
+        return nil;
+    }
     return [[NSString alloc] initWithData:[self responseData] encoding:encoding];
 }
 
 #if TARGET_OS_IPHONE
 -(UIImage*) responseImage {
+    if (nil == [self responseData]) {
+        return nil;
+    }
+    
     return [UIImage imageWithData:[self responseData]];
 }
 #elif TARGET_OS_MAC
 -(NSImage*) responseImage {
-    
+    if (nil == [self responseData]) {
+        return nil;
+    }
     return [[NSImage alloc] initWithData:[self responseData]];
 }
 
 -(NSXMLDocument*) responseXML {
-    
+    if (nil == [self responseData]) {
+        return nil;
+    }
     return [[NSXMLDocument alloc] initWithData:[self responseData] options:0 error:nil];
 }
 #endif
 
 -(id) responseJSON {
-    
+    if (nil == [self responseData]) {
+        return nil;
+    }
     if(NSClassFromString(@"NSJSONSerialization")) {
         if([self responseData] == nil) return nil;
         NSError *error = nil;
@@ -1439,5 +1481,14 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
         _cipher.file = self.downloadFile;
     }
     return _cipher;
+}
+#pragma mark - Added to suppot local testing
+//Added by Salesforce
+-(void)setLocalTestData:(NSData*)localData {
+    self.readFromLocalData = YES;
+    if (localData) {
+        self.mutableData = [NSMutableData data];
+        [self.mutableData appendData:localData];
+    }
 }
 @end

@@ -600,4 +600,8 @@ typedef enum {
 - (id)initWithURLString:(NSString *)aURLString
                  params:(NSMutableDictionary *)params
              httpMethod:(NSString *)method;
+
+/**Customization by Salesforce to support lcoal testing
+ */
+-(void)setLocalTestData:(NSData*)localData;
 @end

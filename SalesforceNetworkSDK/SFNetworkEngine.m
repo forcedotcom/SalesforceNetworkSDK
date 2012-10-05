@@ -37,10 +37,30 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 
 @interface SFNetworkEngine  ()
 
+/** Return YES if the new coordinator passed in should trigger the re-creation of the nework engine
+
+ Condition that should trigger network engine re-creation include
+ - Instance URL change
+ - User ID change
+ - Org ID change
+ 
+ @param coordinator New SFOAuthCoordinator object
+*/
 - (BOOL)needToRecreateNetworkEngine:(SFOAuthCoordinator *)coordinator;
+
+/** Return default custom HTTP headers
+ 
+ Default HTTP headers include
+ - User-Agent string that include application name, version, os version and platform type. See `[NSString userAgentString]` in `NSString+SFAddtions` for more details
+ - Authorization header with OAuth type and OAuth access token
+ */
 - (NSDictionary *)defaultCustomHeaders;
+
+/** Method to be invoked when reachability status changed
+ 
+ @param ns New rechability status
+ */
 - (void)reachabilityChanged:(NetworkStatus)ns;
-- (BOOL)operationAlreadyInWaitingQueue:(SFNetworkOperation *)operation;
 @end
 
 @implementation SFNetworkEngine
@@ -55,6 +75,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 @synthesize previousOAuthDelegate = _previousOAuthDelegate;
 @synthesize networkChangeShouldTriggerTokenRefresh = _networkChangeShouldTriggerTokenRefresh;
 @synthesize enableHttpPipeling = _enableHttpPipeling;
+@synthesize supportLocalTestData = _supportLocalTestData;
 
 #pragma mark - Initialization
 - (id)init {
@@ -64,7 +85,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         _operationTimeout = kDefaultTimeOut;
         _suspendRequestsWhenAppEntersBackground = YES;
         _enableHttpPipeling = YES;
-        
+        _supportLocalTestData = NO;
         _operationsWaitingForAccessToken = [[NSMutableArray alloc] init];
         
         //Monitor application enters and exist background
@@ -274,10 +295,17 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
             }
         }
     }
+    
     //Make sure authorization header is up-to-date
     if (operation.requiresAccessToken) {
         NSString *token = [NSString stringWithFormat:kAuthoriationHeader, self.coordinator.credentials.accessToken];
         [operation setHeaderValue:token forKey:kAuthoriationHeaderKey];
+    }
+    
+    //Handle testing mode and read data from local test file
+    if (self.supportLocalTestData && nil != operation.localTestDataPath && nil != operation.internalOperation) {
+        NSData *fileData = [self readDataFromTestFile:operation.localTestDataPath];
+        [operation.internalOperation setLocalTestData:fileData];
     }
     
     MKNetworkEngine *engine = [self internalNetworkEngine];
@@ -291,6 +319,18 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     [[NSNotificationCenter defaultCenter] postNotificationName:SFNetworkOperationEngineOperationCancelledNotification object:nil userInfo:nil];
 }
 
+- (void)cancelAllOperationsWithTag:(NSString *)operationTag {
+    if (nil == operationTag || nil == _internalNetworkEngine) {
+        return;
+    }
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
+    NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
+    for (MKNetworkOperation *operation in operations) {
+        if (!operation.isFinished) {
+            [operation cancel];
+        }
+    }
+}
 - (void)suspendAllOperations {
     if (nil != _internalNetworkEngine) {
         [_internalNetworkEngine suspendAllOperations];
@@ -309,12 +349,11 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (nil == operationTag || nil == _internalNetworkEngine) {
        return NO;
     }
-    NSArray *operations = [_internalNetworkEngine operations];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
+    NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
     for (MKNetworkOperation *operation in operations) {
-        if ([operation.tag isEqualToString:operationTag]) {
-            if (!operation.isFinished) {
+        if (!operation.isFinished) {
                 return YES;
-            }
         }
     }
     return NO;
@@ -437,6 +476,10 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (self.networkChangeShouldTriggerTokenRefresh && ns != NotReachable) {
         [self startRefreshAccessTokenFlow];
     }
+    
+    if (ns != NotReachable) {
+        [self replayOperationsWaitingForNetwork];
+    }
 }
 - (BOOL)isReachable {
     if (_internalNetworkEngine) {
@@ -476,15 +519,23 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     }
 }
 
+- (void)restoreOAuthDelegate {
+    if (nil != self.previousOAuthDelegate && nil != self.coordinator) {
+        self.coordinator.delegate = self.previousOAuthDelegate;
+        self.previousOAuthDelegate = nil;
+    }
+}
+
+#pragma mark - Queue and Replay for Access Token
 - (void)queueOperationOnExpiredAccessToken:(SFNetworkOperation *)operation {
     if (nil == operation) {
         return;
     }
     [self startRefreshAccessTokenFlow];
     
-    if (![self operationAlreadyInWaitingQueue:operation]) {
-        SFNetworkOperation *newOperation = [self cloneOperation:operation];
-        if (newOperation) {
+    SFNetworkOperation *newOperation = [self cloneOperation:operation];
+    if (newOperation) {
+        @synchronized(self) {
             [self.operationsWaitingForAccessToken addObject:newOperation];
         }
     }
@@ -494,11 +545,13 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (self.isAccessTokenBeingRefreshed) {
         return;
     }
-    if (self.operationsWaitingForAccessToken.count == 0) {
-        return;
-    }
+    
     NSArray *safeCopy = nil;
     @synchronized(self) {
+        if (self.operationsWaitingForAccessToken.count == 0) {
+            return;
+        }
+        
         safeCopy = [self.operationsWaitingForAccessToken copy];
         [self.operationsWaitingForAccessToken removeAllObjects];
     }
@@ -525,10 +578,32 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     }
 }
 
-- (void)restoreOAuthDelegate {
-    if (nil != self.previousOAuthDelegate && nil != self.coordinator) {
-        self.coordinator.delegate = self.previousOAuthDelegate;
-        self.previousOAuthDelegate = nil;
+#pragma mark - Queue and Replay for Network 
+- (void)queueOperationOnNetworkError:(SFNetworkOperation *)operation {
+    if (nil == operation) {
+        return;
+    }
+    
+    SFNetworkOperation *newOperation = [self cloneOperation:operation];
+    if (newOperation) {
+        @synchronized(self) {
+            [self.operationsWaitingForNetwork addObject:newOperation];
+        }
+    }
+}
+
+- (void)replayOperationsWaitingForNetwork {
+    NSArray *safeCopy = nil;
+    @synchronized(self) {
+        if (self.operationsWaitingForNetwork.count == 0) {
+            return;
+        }
+        safeCopy = [self.operationsWaitingForNetwork copy];
+        [self.operationsWaitingForNetwork removeAllObjects];
+    }
+    
+    for (SFNetworkOperation *operation in safeCopy) {
+        [self enqueueOperation:operation];
     }
 }
 
@@ -618,6 +693,8 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     newOpeartion.requiresAccessToken = operation.requiresAccessToken;
     
     //Clone all properties
+    newOpeartion.maximumNumOfRetriesForNetworkError = operation.maximumNumOfRetriesForNetworkError;
+    newOpeartion.numOfRetriesForNetworkError = operation.numOfRetriesForNetworkError;
     newOpeartion.queuePriority = operation.queuePriority;
     newOpeartion.tag = operation.tag;
     newOpeartion.expectedDownloadSize = operation.expectedDownloadSize;
@@ -649,5 +726,16 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     }
     
     return newOpeartion;
+}
+
+#pragma mark - Local Test Data Support
+- (NSData *)readDataFromTestFile:(NSString *)localDataFilePath {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:localDataFilePath]){
+        return nil;
+    }
+    NSData *fileData = [NSData dataWithContentsOfFile:localDataFilePath];
+    
+    return fileData;
 }
 @end

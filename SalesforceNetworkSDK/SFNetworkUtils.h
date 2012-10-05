@@ -8,9 +8,21 @@
 
 #import <Foundation/Foundation.h>
 
-//Declare various error type
+
+/** Various error type that a SFNetworkOperation could fail upon
+ 
+- SFNetworkOperationErrorTypeNetworkError: Network related error, including error code of kCFURLErrorNotConnectedToInternet, kCFURLErrorCannotFindHost, kCFURLErrorCannotConnectToHost, kCFURLErrorNetworkConnectionLost, kCFURLErrorDNSLookupFailed, kCFURLErrorResourceUnavailable and kCFURLErrorTimedOut
+ 
+- SFNetworkOperationErrorTypeSessionTimeOut: Session time out error, error code 401
+- SFNetworkOperationErrorTypeOAuthError: OAuth related error. including error code of kSFOAuthErrorAccessDenied, kSFOAuthErrorInvalidClientId, kSFOAuthErrorInvalidGrant, kSFOAuthErrorInactiveUser and kSFOAuthErrorInactiveOrg
+- SFNetworkOperationErrorTypeAccessDenied: Access denied error, error code 403 
+- SFNetworkOperationErrorTypeAPILimitReached: Server side API limited reached error, error code 503
+- SFNetworkOperationErrorTypeURLNoLongerExists: URL no longer exists error, error code 404. Typical error when trying to get to a resource that is already deleted on the server
+- SFNetworkOperationErrorTypeInternalServerError: Remote server internal error, error code 500. Typical error when remote server is temporarialy down
+- SFNetworkOperationErrorTypeUnknown: For other errors that has error code not matching one of the above
+ */
 typedef enum {
-    SFNetworkOperationErrorTypeNetworkError = 0, //network connectivity error
+    SFNetworkOperationErrorTypeNetworkError = 0,
     SFNetworkOperationErrorTypeSessionTimeOut,
     SFNetworkOperationErrorTypeOAuthError,
     SFNetworkOperationErrorTypeAccessDenied,

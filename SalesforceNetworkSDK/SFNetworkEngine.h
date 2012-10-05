@@ -89,6 +89,17 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 @property (nonatomic, assign) BOOL enableHttpPipeling;
 
+/** Set to YES to allow `SFNetworkEngine` to let `SFNetworkOperation` to use local test file to simulate server response if `[SFNetworkOperation localTestDataPath]` is set. Default value is NO
+ 
+ When this property is set to YES, you can set `[SFNetworkOperation localTestDataPath]` with the full path to a 
+ local test file, and when `[SFNetworkEngine enqueueOperation]` is called, the operation
+ will read response data from the specified test file instead of making a remote call and invoke completion blocks
+ following the normal flow
+ 
+ Make sure you set this property to NO in release build
+*/
+@property (nonatomic, assign) BOOL supportLocalTestData;
+
 /**Set to true to suspend all pending requests when app enters background. Default is YES*/
 @property (nonatomic, assign, getter = shouldSuspendRequestsWhenAppEntersBackground) BOOL suspendRequestsWhenAppEntersBackground;
 
@@ -175,7 +186,6 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 - (void)enqueueOperation:(SFNetworkOperation*)operation;
 
-
 /**Clean up the SFNetworkEngine due to host change or logout
  
  This method should be called upon user logout
@@ -191,6 +201,14 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 - (void)cancelAllOperations;
 
+/** Cancel all operations with a specific tag that are waiting to be excecuted
+ 
+ This method will cancel all operations that are either running or waiting to be executed that matches the specific operation tag
+ 
+  @param operationTag Operation tag
+ */
+- (void)cancelAllOperationsWithTag:(NSString *)operationTag;
+
 /**Suspend all operations that are waiting to be excecuted
  */
 - (void)suspendAllOperations;
@@ -200,6 +218,8 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
 - (void)resumeAllOperations;
 
 /**Returns YES of there are pending requests matching the specified operation tag
+ 
+ @param operationTag Operation tag
  */
 - (BOOL)hasPendingOperationsWithTag:(NSString *)operationTag;
 @end

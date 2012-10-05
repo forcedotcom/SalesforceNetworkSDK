@@ -35,6 +35,9 @@
 @implementation SFNetworkUtils
 
 + (BOOL)isNetworkError:(NSError *)error {
+    if (nil == error) {
+        return NO;
+    }
     switch (error.code) {
         case kCFURLErrorNotConnectedToInternet:
         case kCFURLErrorCannotFindHost:
@@ -51,6 +54,9 @@
 }
 
 + (BOOL)isOAuthError:(NSError *)error {
+    if (nil == error) {
+        return NO;
+    }
     switch (error.code) {
         case kSFOAuthErrorAccessDenied:
         case kSFOAuthErrorInvalidClientId:
@@ -65,6 +71,9 @@
 }
 
 + (BOOL)isSessionTimeOutError:(NSError *)error {
+    if (nil == error) {
+        return NO;
+    }
     if (error.code == 401) {
         return YES;
     } else {

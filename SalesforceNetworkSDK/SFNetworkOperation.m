@@ -20,8 +20,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 
 @implementation SFNetworkOperation
 @synthesize tag = _tag;
+@synthesize localTestDataPath = _localTestDataPath;
 @synthesize expectedDownloadSize = _expectedDownloadSize;
 @synthesize operationTimeout = _operationTimeout;
+@synthesize maximumNumOfRetriesForNetworkError = _maximumNumOfRetriesForNetworkErrorr;
+@synthesize numOfRetriesForNetworkError = _numOfRetriesForNetworkError;
 @synthesize useSSL = _useSSL;
 @synthesize method = _method;
 @synthesize url = _url;
@@ -35,6 +38,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 @synthesize cachePolicy = _cachePolicy;
 @synthesize internalOperation = _internalOperation;
 @synthesize cancelBlocks = _cancelBlocks;
+@synthesize retryOnNetworkError = _retryOnNetworkError;
 
 #pragma mark - Initialize Method
 - (id)initWithOperation:(MKNetworkOperation *)operation url:(NSString *)url method:(NSString *)method ssl:(BOOL)useSSL {
@@ -92,6 +96,17 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
     return NO;
 }
+
+- (NSUInteger)hash {
+    if (_internalOperation) {
+        return [[_internalOperation uniqueIdentifier] hash];
+    }
+    else {
+        //If internal operation is nil, super hash
+        return [super hash];
+    }
+}
+
 - (NSError *)error {
     if (_internalOperation) {
         return [_internalOperation error];
@@ -121,7 +136,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return [_internalOperation curlCommandLineString];
     }
     else {
-        return @"";
+        return [super description];
     }
 }
 - (void)setOperationTimeout:(NSTimeInterval)operationTimeout {
@@ -157,39 +172,52 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 }
 
 - (void)cancel {
-    if (_internalOperation) {
-        [_internalOperation cancel];
-        
-        __weak SFNetworkOperation *weakSelf = self;
-        if (weakSelf.delegate && [weakSelf respondsToSelector:@selector(operationDidCancel:)]) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                [self.delegate operationDidCancel:weakSelf];
-            });
-        }
-        
-        //call cancel blocks
-        if (self.cancelBlocks && self.cancelBlocks.count > 0) {
-            NSArray *safeCopy = nil;
-            @synchronized(self) {
-                safeCopy = [self.cancelBlocks copy];
-                [self.cancelBlocks removeAllObjects];
-            }
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                for (SFNetworkOperationCancelBlock cancelBlock in safeCopy) {
-                    cancelBlock(weakSelf);
-                }
-            });
-        }
+    if (!_internalOperation) {
+        [self log:SFLogLevelWarning msg:@"Cancel an operation that does not have internal network operation set first"];
+        return;
+    }
+    NSString *operationIdentifier = [_internalOperation uniqueIdentifier];
+    [[self class] deleteUnfinishedDownloadFileForOperation:self.internalOperation];
+    
+    [_internalOperation cancel];
+    
+    __weak SFNetworkOperation *weakSelf = self;
+    if (weakSelf.delegate && [weakSelf respondsToSelector:@selector(networkOperationDidCancel:)]) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            [self.delegate networkOperationDidCancel:weakSelf];
+        });
     }
     
+    //call cancel blocks
+    if (self.cancelBlocks && self.cancelBlocks.count > 0) {
+        NSArray *safeCopy = nil;
+        @synchronized(self) {
+            safeCopy = [self.cancelBlocks copy];
+            [self.cancelBlocks removeAllObjects];
+        }
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            for (SFNetworkOperationCancelBlock cancelBlock in safeCopy) {
+                cancelBlock(weakSelf);
+            }
+        });
+    }
+
     //Locate existing operations that are already in the queue
+    //with the same unique ID
     MKNetworkEngine *engine = [[SFNetworkEngine sharedInstance] internalNetworkEngine];
-    for (MKNetworkOperation *operation in  engine.operations) {
-        if ([[operation uniqueIdentifier] isEqualToString:[_internalOperation uniqueIdentifier]] && !operation.isFinished) {
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"uniqueIdentifier = %@", operationIdentifier];
+    NSArray *operations = [[engine operations] filteredArrayUsingPredicate:predicate];
+    for (MKNetworkOperation *operation in operations) {
+        if (!operation.isFinished) {
             [operation cancel];
+            
+            //cancel download file if applicable
+            [[self class] deleteUnfinishedDownloadFileForOperation:operation];
         }
     }
 }
+
 - (void)setQueuePriority:(NSOperationQueuePriority)p {
     [super setQueuePriority:p];
     if (_internalOperation) {
@@ -251,8 +279,16 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         } onError:^(NSError *error) {
             if (weakSelf.requiresAccessToken && [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeSessionTimeOut) {
                 //do nothing, queueOperationOnExpiredAccessToken is handled in callDelegateDidFailWithError
-                [self log:SFLogLevelError msg:@"Session time out encountered"];
-            } else if (errorBlock) {
+                [weakSelf log:SFLogLevelError format:@"Session time out encountered. Actual error: [%@]. Will be retried in callDelegateDidFailWithError", [error localizedDescription]];
+                return;
+            }
+            if ([weakSelf shouldRetryOperation:weakSelf onNetworkError:error]) {
+                //do nothing, queueOperationOnExpiredAccessToken is handled in callDelegateDidFailWithError
+                [weakSelf log:SFLogLevelError format:@"Network time out encountered. Actual error: [%@]. Will be retried in callDelegateDidFailWithError", [error localizedDescription]];
+                return;
+            }
+            
+            if (errorBlock) {
                 if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
                     //Permission denied error
                     NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
@@ -328,6 +364,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     return nil;
 }
 - (id)responseAsJSON {
+    NSString *responseStr = [self responseAsString];
+    if (nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
+        //Not JSON format
+        return nil;
+    }
     if (_internalOperation) {
         return _internalOperation.responseJSON;
     }
@@ -349,7 +390,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 #pragma mark - Delegate Methods
 - (void)callDelegateDidFinish:(MKNetworkOperation *)operation {
     __weak SFNetworkOperation *weakSelf = self;
-    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(operationDidFinish:)]) {
+    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(networkOperationDidFinish:)]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
             NSError *error = [weakSelf checkForErrorInResponse:operation];
             if (nil != error) {
@@ -357,43 +398,51 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             }
             else {
                 weakSelf.internalOperation = operation;
-                [weakSelf.delegate operationDidFinish:weakSelf];
+                [weakSelf.delegate networkOperationDidFinish:weakSelf];
             }
         });
     }
 }
 - (void)callDelegateDidFailWithError:(NSError *)error {
+    if (nil == error) {
+        [self log:SFLogLevelError format:@"callDelegateDidFailWithError invoked with nil error"];
+        return;
+    }
+    
     [self log:SFLogLevelError format:@"callDelegateDidFailWithError %@", error];
     __weak SFNetworkOperation *weakSelf = self;
-    if (nil != error) {
-        if (nil != self.pathToStoreDownloadedContent) {
-            //Download failed, remove the file if it exists to prevent partial file content
-            NSFileManager *fileManager = [NSFileManager defaultManager];
-            if ([fileManager fileExistsAtPath:self.pathToStoreDownloadedContent]) {
-                [fileManager removeItemAtPath:self.pathToStoreDownloadedContent error:nil];
-            }
-        }
+    [[self class] deleteUnfinishedDownloadFileForOperation:weakSelf.internalOperation];
+    
+    if (weakSelf.requiresAccessToken && [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeSessionTimeOut) {
+        [weakSelf log:SFLogLevelError msg:@"Session timeout encountered. Automatically retry starts"];
+        [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:weakSelf];
+        return;
     }
-    if (nil != error) {
-        if (weakSelf.requiresAccessToken && [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeSessionTimeOut) {
-            [self log:SFLogLevelError msg:@"Session time out encountered"];
-            [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:weakSelf];
-            return;
-        }
+   
+    
+    if ([weakSelf shouldRetryOperation:weakSelf onNetworkError:error]) {
+        [weakSelf log:SFLogLevelError msg:@"Network error encountered. Automatically retry starts"];
+        //Increase the current retry count
+        _numOfRetriesForNetworkError++;
+        [[SFNetworkEngine sharedInstance] queueOperationOnNetworkError:weakSelf];
+        return;
     }
-    if (nil != error && weakSelf.delegate) {
+    
+    if (weakSelf.delegate) {
         if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
             //Permission denied error
+            //Server side sometimes return 403 with JSON object to
+            //indicate permission denied error
             NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
             if (potentialError) {
                 error = potentialError;
             }
         }
         if (error.code == kCFURLErrorTimedOut) {
-            if ([weakSelf.delegate respondsToSelector:@selector(operationDidTimeout:)]) {
+            if ([weakSelf.delegate respondsToSelector:@selector(networkOperationDidTimeout:)]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     if (error.code == kCFURLErrorTimedOut) {
-                        [weakSelf.delegate operationDidTimeout:weakSelf];
+                        [weakSelf.delegate networkOperationDidTimeout:weakSelf];
                     }
                 });
                 return;
@@ -401,10 +450,10 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         }
         
         //If delegate did not implement operationDidTimeout or error is not timedout error
-        if ([weakSelf.delegate respondsToSelector:@selector(operation:didFailWithError:)]) {
+        if ([weakSelf.delegate respondsToSelector:@selector(networkOoperation:didFailWithError:)]) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                 if (error.code == kCFURLErrorTimedOut) {
-                    [weakSelf.delegate operation:weakSelf didFailWithError:error];
+                    [weakSelf.delegate networkOperation:weakSelf didFailWithError:error];
                 }
             });
             return;
@@ -419,7 +468,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return nil;
     }
     NSString *responseStr = [operation responseString];
-    if (nil == responseStr || ![responseStr hasPrefix:@"{"] || ![responseStr hasPrefix:@"["]) {
+    if (nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
         //Not JSON format
         return nil;
     }
@@ -440,6 +489,27 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     return nil;
 }
 
-
-
+- (BOOL)shouldRetryOperation:(SFNetworkOperation *)operation onNetworkError:(NSError *)error {
+    if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeNetworkError) {
+        BOOL retryOnNetworkError = NO;
+        if (operation.retryOnNetworkError) {
+            if (operation.maximumNumOfRetriesForNetworkError == 0 || operation.numOfRetriesForNetworkError < operation.maximumNumOfRetriesForNetworkError) {
+                retryOnNetworkError = YES;
+            }
+        }
+        return retryOnNetworkError;
+    } else {
+        return NO;
+    }
+}
++ (void)deleteUnfinishedDownloadFileForOperation:(MKNetworkOperation *)operation {
+    if (nil == operation || nil == operation.downloadFile) {
+        return;
+    }
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if ([fileManager fileExistsAtPath:operation.downloadFile]) {
+        [fileManager removeItemAtPath:operation.downloadFile error:nil];
+    }
+}
 @end

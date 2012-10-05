@@ -14,14 +14,19 @@ typedef void (^SFNetworkOperationCompletionBlock)(SFNetworkOperation* operation)
 typedef void (^SFNetworkOperationCancelBlock)(SFNetworkOperation* operation);
 typedef void (^SFNetworkOperationErrorBlock)(NSError* error);
 typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict);
+
+/** Delegate to implement to get notified on network operation status change
+ */
 @protocol SFNetworkOperationDelegate <NSObject>
 
 @optional
-- (void)operationDidFinish:(SFNetworkOperation *)operation;
-- (void)operation:(SFNetworkOperation *)operation didFailWithError:(NSError *)error;
-- (void)operationDidCancel:(SFNetworkOperation *)operation;
-- (void)operationDidTimeout:(SFNetworkOperation *)operation;
+- (void)networkOperationDidFinish:(SFNetworkOperation *)operation;
+- (void)networkOperation:(SFNetworkOperation *)operation didFailWithError:(NSError *)error;
+- (void)networkOperationDidCancel:(SFNetworkOperation *)operation;
+- (void)networkOperationDidTimeout:(SFNetworkOperation *)operation;
 @end
+
+
 /**
  Main class used to create and execute remote network call
  
@@ -46,6 +51,27 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
 /** Network timeout setting in seconds. Default value is 180 seconds
  */
 @property (nonatomic, assign) NSTimeInterval operationTimeout;
+
+/** Set to YES to enable automatic retry if operation failed to due network error. Default value is NO
+ 
+ See `SFNetworkOperationErrorType` for details on the logic of detecting network error
+ 
+ Because there is a slight chance that due to unstable connectivity operation can error out after server side 
+ receives the response and before operation can get a valid response back. You need to be careful when setting
+ this property to YES and be aware of possible duplication requests if auto retry is turned on.
+ */
+@property (nonatomic, assign) BOOL retryOnNetworkError;
+
+/** Maximum number of retries if operation failed due to network error. Default value is 0, i.e. no limit.
+ */
+@property (nonatomic, assign) NSUInteger maximumNumOfRetriesForNetworkError;
+
+/** Set this property to enable SFNetworkOperation to read test data from a local file
+ 
+ This feature is useful to simulate server side response using a local mock up data file for testing purpose. 
+ `[SFNetworkEngine supportLocalTestData]` needs to be set to YES for this property to take effect
+*/
+@property (nonatomic, copy) NSString *localTestDataPath;
 
 /** Returns the HTTP method for this operation
  */
