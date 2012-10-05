@@ -188,6 +188,14 @@ typedef enum {
 
 /**Moved by Salesforcd to public accessor*/
 @property (nonatomic, strong) NSMutableArray *errorBlocks;
+@property (strong, nonatomic) NSMutableDictionary *fieldsToBePosted;
+@property (strong, nonatomic) NSMutableArray *filesToBePosted;
+@property (strong, nonatomic) NSMutableArray *dataToBePosted;
+@property (nonatomic, strong) NSMutableArray *responseBlocks;
+@property (nonatomic, strong) NSMutableArray *uploadProgressChangedHandlers;
+@property (nonatomic, strong) NSMutableArray *downloadProgressChangedHandlers;
+@property (nonatomic, copy) MKNKEncodingBlock postDataEncodingHandler;
+
 
 /** Added by Salesforce to support custom HTTP Pipeling setting */
 @property (nonatomic, assign) BOOL enableHttpPipelining;
@@ -592,4 +600,8 @@ typedef enum {
 - (id)initWithURLString:(NSString *)aURLString
                  params:(NSMutableDictionary *)params
              httpMethod:(NSString *)method;
+
+/**Customization by Salesforce to support lcoal testing
+ */
+-(void)setLocalTestData:(NSData*)localData;
 @end

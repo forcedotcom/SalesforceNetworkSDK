@@ -8,6 +8,30 @@
 
 #import <Foundation/Foundation.h>
 
+
+/** Various error type that a SFNetworkOperation could fail upon
+ 
+- SFNetworkOperationErrorTypeNetworkError: Network related error, including error code of kCFURLErrorNotConnectedToInternet, kCFURLErrorCannotFindHost, kCFURLErrorCannotConnectToHost, kCFURLErrorNetworkConnectionLost, kCFURLErrorDNSLookupFailed, kCFURLErrorResourceUnavailable and kCFURLErrorTimedOut
+ 
+- SFNetworkOperationErrorTypeSessionTimeOut: Session time out error, error code 401
+- SFNetworkOperationErrorTypeOAuthError: OAuth related error. including error code of kSFOAuthErrorAccessDenied, kSFOAuthErrorInvalidClientId, kSFOAuthErrorInvalidGrant, kSFOAuthErrorInactiveUser and kSFOAuthErrorInactiveOrg
+- SFNetworkOperationErrorTypeAccessDenied: Access denied error, error code 403 
+- SFNetworkOperationErrorTypeAPILimitReached: Server side API limited reached error, error code 503
+- SFNetworkOperationErrorTypeURLNoLongerExists: URL no longer exists error, error code 404. Typical error when trying to get to a resource that is already deleted on the server
+- SFNetworkOperationErrorTypeInternalServerError: Remote server internal error, error code 500. Typical error when remote server is temporarialy down
+- SFNetworkOperationErrorTypeUnknown: For other errors that has error code not matching one of the above
+ */
+typedef enum {
+    SFNetworkOperationErrorTypeNetworkError = 0,
+    SFNetworkOperationErrorTypeSessionTimeOut,
+    SFNetworkOperationErrorTypeOAuthError,
+    SFNetworkOperationErrorTypeAccessDenied,
+    SFNetworkOperationErrorTypeAPILimitReached,
+    SFNetworkOperationErrorTypeURLNoLongerExists,
+    SFNetworkOperationErrorTypeInternalServerError,
+    SFNetworkOperationErrorTypeUnknown
+} SFNetworkOperationErrorType;
+
 /** Helper class for SFNetworkSDK 
  
  This class provides
@@ -16,39 +40,9 @@
  */
 @interface SFNetworkUtils : NSObject
 
-/** Return YES if error is related to network connectivity error
+/** Get error type for the specified error
  
- @param error NSError object used to check whether the error is related to network connectivity error
+ @param error NSError object to get error type for
  */
-+ (BOOL)isNetworkError:(NSError *)error;
-
-/** Return YES if error is related to OAuth error
- 
- OAuth error should trigger a login progress again
- @param error NSError object used to check whether the error is related to OAuth error
- */
-+ (BOOL)isOAuthError:(NSError *)error;
-
-/** Return YES if error is related to session timeout
- 
- Session timeout error should trigger access token refresh process
- @param error NSError object used to check whether the error is related to session timeout error
- */
-+ (BOOL)isSessionTimeOutError:(NSError *)error;
-
-/**Helper method to translate NSError to the localized string to use to display the error
- 
- 
- It will return nil if error parameter is nil. Return `[NSError localizzedDesription], if NSError does not have one of the listed status code
- 
- session time out error - Returns "SESSION_TIME_OUT"
- network error - Returns localized string for key "NETWORK_CONNECTION_ERROR"
- 400 status code - Returns localized string for key "INVALID_REQUEST_FORMAT"
- 403 status code - Returns localized string for key "ACCESS_FORBIDDEN"
- 404 status code - Returns localized string for key "URL_NO_LONGER_EXISTS"
- 500 status code - Returns localized string for key "INTERNAL_SERVER_ERROR"
- 503 status code - Returns localized string for key "API_LIMIT_REACHED"
- @param error NSError object used to translate the error message to user friendly error mesasge
- */
-+ (NSString *)displayMessageForError:(NSError *)error;
++ (SFNetworkOperationErrorType)typeOfError:(NSError *)error;
 @end

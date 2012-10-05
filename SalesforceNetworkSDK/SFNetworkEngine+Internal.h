@@ -11,11 +11,21 @@
 #import "SFNetworkEngine.h"
 #import "SFOAuthCoordinator.h"
 @interface SFNetworkEngine () <SFOAuthCoordinatorDelegate>
+
+@property (nonatomic, strong) MKNetworkEngine *internalNetworkEngine;
+
 /** Queue to store all operations queued up due to expired access token
  
  This queue will contain all operations that failed due to expired token and all incoming pending operations that requires access token
  */
 @property NSMutableArray *operationsWaitingForAccessToken;
+
+
+/** Queue to store all operations queued up due to network error
+ 
+ This queue will contain all operations that failed due to network error, has greater than 0 `[SFNetworkOperation maximumNumOfRetriesForNetworkError]` value and `[SFNetworkOperation numOfRetriesForNetworkError]` is less than `[SFNetworkOperation maximumNumOfRetriesForNetworkError]
+ */
+@property NSMutableArray *operationsWaitingForNetwork;
 
 
 /** Flag to indicate whether or not `SFNetworkEngine` token refresh flow is in progress or not
@@ -33,6 +43,17 @@
 @property (nonatomic, assign) id<SFOAuthCoordinatorDelegate> previousOAuthDelegate;
 
 
+/** Read and return data from local test file
+ 
+ See `supportLocalTestData` for more details
+ 
+ @param localDataFilePath Path to the local test data file. Full path must be provided
+ */
+- (NSData *)readDataFromTestFile:(NSString *)localDataFilePath;
+
+///---------------------------------------------------------------
+/// @name Access Token Refresh Method
+///---------------------------------------------------------------
 /** Start refresh access token flow
 */
 - (void)startRefreshAccessTokenFlow;
@@ -51,6 +72,15 @@
  */
 - (void)accessTokenRefreshed:(SFOAuthCoordinator *)coordinator;
 
+/** Restore the original OAuth delegate after access token fresh flow stopped
+ 
+ See `previousOAuthDelegate` for more details
+ */
+- (void)restoreOAuthDelegate;
+
+///---------------------------------------------------------------
+/// @name Queue & Replay Operation Methods
+///---------------------------------------------------------------
 /** Queue `SFNetworkOperation` due to expired access token 
  */
 - (void)queueOperationOnExpiredAccessToken:(SFNetworkOperation *)operation;
@@ -59,13 +89,21 @@
  */
 - (void)replayOperationsWaitingForAccessToken;
 
-/** Fatal OAuth error happened. Call error block of all operations stored in `operationsWaitingForAccessToken` queue 
+/** Fatal OAuth error happened. Call error block of all operations stored in `operationsWaitingForAccessToken` queue
  */
 - (void)failOperationsWaitingForAccessTokenWithError:(NSError *)error;
 
-/** Restore the original OAuth delegate after access token fresh flow stopped 
- 
- See `previousOAuthDelegate` for more details
+/** Queue `SFNetworkOperation` due to network error
  */
-- (void)restoreOAuthDelegate;
+- (void)queueOperationOnNetworkError:(SFNetworkOperation *)operation;
+
+/** Replay all operations stored in `operationsWaitingForNetwork` queue
+ */
+- (void)replayOperationsWaitingForNetwork;
+
+/**Clone an operation. Used to re-queue a failed operation
+ 
+@param operation Existing `SFNetworkOperation` to clone from
+ */
+- (SFNetworkOperation *)cloneOperation:(SFNetworkOperation *)operation;
 @end

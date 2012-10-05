@@ -14,14 +14,19 @@ typedef void (^SFNetworkOperationCompletionBlock)(SFNetworkOperation* operation)
 typedef void (^SFNetworkOperationCancelBlock)(SFNetworkOperation* operation);
 typedef void (^SFNetworkOperationErrorBlock)(NSError* error);
 typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict);
+
+/** Delegate to implement to get notified on network operation status change
+ */
 @protocol SFNetworkOperationDelegate <NSObject>
 
 @optional
-- (void)operationDidFinish:(SFNetworkOperation *)operation;
-- (void)operation:(SFNetworkOperation *)operation didFailWithError:(NSError *)error;
-- (void)operationDidCancel:(SFNetworkOperation *)operation;
-- (void)operationDidTimeout:(SFNetworkOperation *)operation;
+- (void)networkOperationDidFinish:(SFNetworkOperation *)operation;
+- (void)networkOperation:(SFNetworkOperation *)operation didFailWithError:(NSError *)error;
+- (void)networkOperationDidCancel:(SFNetworkOperation *)operation;
+- (void)networkOperationDidTimeout:(SFNetworkOperation *)operation;
 @end
+
+
 /**
  Main class used to create and execute remote network call
  
@@ -33,9 +38,9 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
  
  Tag can be used to categorize `SFNetworkOperation` and used together with `[SFNetworkEngine hasPendingOperationsWithTag]`
  */
-@property (nonatomic, strong) NSString *tag;
+@property (nonatomic, copy) NSString *tag;
 
-/**Expected download size
+/** Expected download size
  
  Set this property to the expected download size when running a SFNetworkOperation for downloading a binary content. If this property is not set, `SFNetworkOperation` will rely on the "Content-Length" in response header to properly invoke the `SFNetworkOperationProgressBlock` download progress block
  
@@ -47,9 +52,38 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
  */
 @property (nonatomic, assign) NSTimeInterval operationTimeout;
 
+/** Set to YES to enable automatic retry if operation failed to due network error. Default value is NO
+ 
+ See `SFNetworkOperationErrorType` for details on the logic of detecting network error
+ 
+ Because there is a slight chance that due to unstable connectivity operation can error out after server side 
+ receives the response and before operation can get a valid response back. You need to be careful when setting
+ this property to YES and be aware of possible duplication requests if auto retry is turned on.
+ */
+@property (nonatomic, assign) BOOL retryOnNetworkError;
+
+/** Maximum number of retries if operation failed due to network error. Default value is 0, i.e. no limit.
+ */
+@property (nonatomic, assign) NSUInteger maximumNumOfRetriesForNetworkError;
+
+/** Set this property to enable SFNetworkOperation to read test data from a local file
+ 
+ This feature is useful to simulate server side response using a local mock up data file for testing purpose. 
+ `[SFNetworkEngine supportLocalTestData]` needs to be set to YES for this property to take effect
+*/
+@property (nonatomic, copy) NSString *localTestDataPath;
+
+/** Returns the HTTP method for this operation
+ */
+@property (nonatomic, readonly, copy) NSString *method;
+
+/** Returns YES if use SSL
+*/
+@property (nonatomic, readonly, assign) BOOL useSSL;
+
 /** Request URL Property
  */
-@property (nonatomic, readonly, strong) NSString *url;
+@property (nonatomic, readonly, copy) NSString *url;
 
 /** If the operation results in an error, this will hold the response error, otherwise it will be nil */
 @property (nonatomic, readonly, strong) NSError *error;
@@ -79,14 +113,20 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
  
  CustomHeaders Value specified by this parameter will override value set by `[SFNetworkEngine customHeaders]`
  */
-@property (nonatomic, strong) NSDictionary *customHeaders;
+@property (nonatomic, copy) NSDictionary *customHeaders;
 
 /**Set path to store downloaded content
  
 Path to store downloaded content. If this value is set, all content downloaded by this operation will be stored at the path specified. And  if `encryptDownloadedFile` is set to true, file content will be encrypted
  */
-@property (nonatomic, strong) NSString *pathToStoreDownloadedContent;
+@property (nonatomic, copy) NSString *pathToStoreDownloadedContent;
 
+
+/** Array of operation cancel blocks
+ 
+ Each block in this array will be invoked when this operation is cancelled
+ */
+@property (nonatomic, readonly, strong) NSMutableArray *cancelBlocks;
 
 /** Set value for the specified HTTP header
  
@@ -106,7 +146,7 @@ Path to store downloaded content. If this value is set, all content downloaded b
  @param postDataEncodingHandler Block to be invoked when your HTTP Method is POST or PUT to translate request body into a custom string representation
  @param contentType Content type for the translated body content. For example, if your `postDataEncodingHandler` translates request body to JSON format, you will need to set contentType to "application/json"
  */
--(void)setCustomPostDataEncodingHandler:(SFNetworkOperationEncodingBlock) postDataEncodingHandler forType:(NSString*)contentType;
+-(void)setCustomPostDataEncodingHandler:(SFNetworkOperationEncodingBlock)postDataEncodingHandler forType:(NSString*)contentType;
 
 ///---------------------------------------------------------------
 /// @name Method for File Upload
@@ -133,9 +173,10 @@ Path to store downloaded content. If this value is set, all content downloaded b
 /** Add block Handler for completion
  
  An operation can have multiple completion and error blocks attached to it. 
- When the operation completes successfully each registered completion block will be executed on a background thread.
- When operation errors out or operation response contains single JSON array with errorCode, each registered error block will be executed on a background thread
+ When the operation completes successfully and operation response is not a JSON array with single JSON error object, each registered completion block will be executed on a background thread.
+ When operation errors out or operation response is a JSON array with single JSON error object, each registered error block will be executed on a background thread. Completion block will not be invoked when errorBlock is invoked
  @param completionBlock Completion block to be invoked when operation is completed successfully
+ @param errorBlock Error block to be invoked when operation erros out or operation response is a JSON array with single JSON error object
  */
 - (void)onCompletion:(SFNetworkOperationCompletionBlock)completionBlock onError:(SFNetworkOperationErrorBlock)errorBlock;
 
