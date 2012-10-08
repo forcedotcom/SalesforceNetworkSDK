@@ -10,6 +10,52 @@
 SCRIPT_ROOT=$(dirname $0)
 . $SCRIPT_ROOT/build.common
 
+
+usage() {
+	[ $# -eq 0 ] || error "$*" >&2
+cat <<EOF >&2
+usage: $0 [options] <action>...
+options:
+    -b=<branch>     Branch name (default: current branch name from git)
+    -o=<logfile>    Log output filename (default: 'output.txt')
+    -j=<jobURL>     Jenkins job URL (default: '\$JOB_URL') $(clr smul)$(clr bold)[REQUIRED]$(clr sgr0)
+    -h              Help
+    -v              Verbose mode
+
+actions:
+    $(clr smul)$(clr bold)all (default)$(clr sgr0)    Builds all actions
+    docs             Generates documentation output
+    all	             Fetch dependencis, Builds release, debug, thin
+    release          Compiles the release build, with simulator and device architectures
+    debug            Compiles the debug build, with simulator and device architectures
+    thin			 Compiles the thin build, with only device architecture
+    dependencies     Fetches and installs dependencies
+    
+misc:
+    The below actions may only be run from a script executing in the context of an Xcode shell
+    (i.e. an Xcode script build phase):
+    
+    public_headers  Generates import headers for Salesforce-iOS-NetworkSDK
+EOF
+    exit 1
+}
+
+OPT_HELP=
+OPT_VERBOSE=
+OPT_BRANCH=`git branch | awk '/^\* / { print $2 }'`
+OPT_JOBURL=$JOB_URL
+while getopts "vhs:w:o:a:b:n:j:" opt; do
+	case $opt in
+        h) OPT_HELP=1 ;;
+        v) OPT_VERBOSE=1 ;;
+        b) OPT_BRANCH=$OPTARG ;;
+        j) OPT_JOBURL=$OPTARG ;;
+        \?) usage "Invalid option: -$opt" ;;
+        :) usage "Option -$opt requires an argument." ;;
+    esac
+done
+shift $((OPTIND-1))
+
 INSTALL_PATH=$WORKSPACE/artifacts
 STATIC_LIB=libSalesforceNetworkSDK.a
 LIBRARY_PATH=Libraries
@@ -19,8 +65,6 @@ DISTRIBUTION_PATH=$PWD/../../distribution
 [ -z $INSTALL_PATH ] || INSTALL_PATH=$PWD/artifacts
 
 PROJ=../$PROJECT_NAME.xcodeproj
-OPT_JOBURL="http://mobile-iosbuild1-1-sfm.ops.sfdc.net/jenkins/job/Salesforce-iOS-NetworkSDK"
-OPT_VERBOSE=1
 declare readonly DEPENDENCIES="$SCRIPT_ROOT/../dependencies"
 
 function build_combined() {
@@ -90,7 +134,7 @@ function gen_headers() {
     
 	for target in $headers; do
         if [ $H/$target.h -nt $PROJECT_FILE_PATH/project.pbxproj ]; then
-            echo "Skipping $target since it is up-to-date"
+            warn "Skipping $target since it is up-to-date"
             continue
         fi
         
@@ -126,7 +170,7 @@ function fetch_dependencies() {
 # Main function of this script
 function main() {
     if [ $# == 0 ]; then
-        help
+    	usage "You must supply a command."
     fi
 
 	#prep install path
@@ -140,31 +184,35 @@ function main() {
     if [[ $args =~ dependencies ]]; then
         if [[ -z $OPT_JOBURL ]] ; then
             if [[ -n $OPT_BRANCH ]] ; then
-                local testURL="http://mobile-iosbuild1-1-sfm.ops.sfdc.net/jenkins/job/Salesforce-iOS-NetworkSDK"
+            	local testURL="http://mobile-iosbuild1-1-sfm.ops.sfdc.net/jenkins/job/Salesforce-iOS-NetworkSDK-$OPT_BRANCH/"
+            	info "$testURL"
                 if [[ $(curl -Is -w "%{http_code}" -o/dev/null $testURL) -eq 200 ]]; then
                     info "No job URL supplied, but guessed it is $testURL"
                     OPT_JOBURL=$testURL
+                else 
+                	info "No job URL supplied, and $testURL calculated from branch cannot be connected"
                 fi
+                 
             fi
         fi
 
-        [[ -z $OPT_JOBURL ]] && help "You must supply a job URL when not running within Jenkins"
+        [[ -z $OPT_JOBURL ]] && usage "You must supply a job URL when not running within Jenkins"
 
         fetch_dependencies
     fi
     
     if [[ $args =~ debug ]] ; then
-        echo "generate combined library for Debug configuration"
+        info "generate combined library for Debug configuration"
         build_combined Debug
     fi
     
     if [[ $args =~ release ]] ; then
-        echo "generate combined library for Release configuration"
+        info "generate combined library for Release configuration"
         build_combined Release
     fi
     
     if [[ $args =~ thin ]] ; then
-        echo "generate thin library for Device Release configuration"
+        info "generate thin library for Device Release configuration"
         build_thin
     fi
     
@@ -173,14 +221,6 @@ function main() {
     fi
 }
 
-#==================================================================================
-# Print out Help for this build script
-function help () {
-	echo "Usage: ./build.sh all - Creates SalesforceNetworkSDK for Debug, Release configuration with a combined library. Also creates a thin library for release on device only"
-	echo "Usage: ./build.sh debug - Creates SalesforceNetworkSDK for Debug configuration with a combined library"
-	echo "Usage: ./build.sh release - Creates SalesforceNetworkSDKileSDK for Release configuration with a combined library"
-	echo "Usage: ./build.sh thin - Creates SalesforceNetworkSDK for Release configuration and device only library"
-}
 
 # Turn on error to stop as soon as something goes wrong
 set -e
