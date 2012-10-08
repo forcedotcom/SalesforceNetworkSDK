@@ -624,7 +624,9 @@
         } else {
             finalURL = [NSURL URLWithString:aURLString];
         }
-        
+        if(self.timeout <= 0) {
+            _timeout = 180; //default to 3 minutesSF
+        }
         self.request = [NSMutableURLRequest requestWithURL:finalURL
                                                cachePolicy:self.cachePolicy
                                            timeoutInterval:[self timeout]];
@@ -1489,6 +1491,12 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     if (localData) {
         self.mutableData = [NSMutableData data];
         [self.mutableData appendData:localData];
+    }
+}
+
+- (void)setTimeout:(NSUInteger)timeout {
+    if (self.request) {
+        [self.request setTimeoutInterval:timeout];
     }
 }
 @end

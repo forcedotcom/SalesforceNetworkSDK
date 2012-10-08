@@ -131,8 +131,8 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         //network engine created before
         if ([self needToRecreateNetworkEngine:coordinator]) {
             [self cleanup];
+             _internalNetworkEngine = nil;
         }
-        _internalNetworkEngine = nil;
     }
     _coordinator = coordinator;
     if (!_internalNetworkEngine) {
