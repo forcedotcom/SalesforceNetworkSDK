@@ -178,7 +178,7 @@ Path to store downloaded content. If this value is set, all content downloaded b
  @param completionBlock Completion block to be invoked when operation is completed successfully
  @param errorBlock Error block to be invoked when operation erros out or operation response is a JSON array with single JSON error object
  */
-- (void)onCompletion:(SFNetworkOperationCompletionBlock)completionBlock onError:(SFNetworkOperationErrorBlock)errorBlock;
+- (void)addCompletionBlock:(SFNetworkOperationCompletionBlock)completionBlock errorBlock:(SFNetworkOperationErrorBlock)errorBlock;
 
 
 /** Add block Handler for cancel
@@ -186,7 +186,7 @@ Path to store downloaded content. If this value is set, all content downloaded b
  An operation can have multiple cancel blocks attached to it. When an operation is cancelled each registered block will be executed on a background thread. 
  @param cancelBlock Error block to be invoked when operation is cancelled
  */
-- (void)onCancel:(SFNetworkOperationCancelBlock)cancelBlock;
+- (void)addCancelBlock:(SFNetworkOperationCancelBlock)cancelBlock;
 
 
 /** Add Block Handler for tracking upload progress
@@ -194,14 +194,14 @@ Path to store downloaded content. If this value is set, all content downloaded b
  An operation can have multiple upload progress blocks attached to it. When upload process changes each registered block will be executed on a background thread
  @param uploadProgressBlock Block to be invoked when upload progress is changed
  */
-- (void)onUploadProgressChanged:(SFNetworkOperationProgressBlock)uploadProgressBlock;
+- (void)addUploadProgressBlock:(SFNetworkOperationProgressBlock)uploadProgressBlock;
 
 /** Add Block Handler for tracking download progress
  
  An operation can have multiple download progress blocks attached to it. When download process changes each registered block will be executed on a background thread
  @param downloadProgressBlock Block to be invoked when download progress is changed
  */
-- (void)onDownloadProgressChanged:(SFNetworkOperationProgressBlock)downloadProgressBlock;
+- (void)addDownloadProgressBlock:(SFNetworkOperationProgressBlock)downloadProgressBlock;
 
 
 ///---------------------------------------------------------------

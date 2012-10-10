@@ -96,6 +96,9 @@
         return SFNetworkOperationErrorTypeSessionTimeOut;
     }
 
+    if (error.code == 400) {
+        return SFNetworkOperationErrorTypeInvalidRequest;
+    }
     if (error.code == 403) {
         return SFNetworkOperationErrorTypeAccessDenied;
     }

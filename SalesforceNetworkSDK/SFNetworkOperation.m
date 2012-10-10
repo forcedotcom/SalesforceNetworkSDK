@@ -260,7 +260,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 }
 
 #pragma mark - Block Methods
-- (void)onCompletion:(SFNetworkOperationCompletionBlock)completionBlock onError:(SFNetworkOperationErrorBlock)errorBlock{
+- (void)addCompletionBlock:(SFNetworkOperationCompletionBlock)completionBlock errorBlock:(SFNetworkOperationErrorBlock)errorBlock{
     if (_internalOperation) {
         __weak SFNetworkOperation *weakSelf = self;
         [_internalOperation onCompletion:^(MKNetworkOperation *completedOperation) {
@@ -306,13 +306,13 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 }
 
 
-- (void)onCancel:(SFNetworkOperationCancelBlock)cancelBlock {
+- (void)addCancelBlock:(SFNetworkOperationCancelBlock)cancelBlock {
     if (cancelBlock) {
         [self.cancelBlocks addObject:[cancelBlock copy]];
     }
 }
 
-- (void)onUploadProgressChanged:(SFNetworkOperationProgressBlock)uploadProgressBlock {
+- (void)addUploadProgressBlock:(SFNetworkOperationProgressBlock)uploadProgressBlock {
     if (_internalOperation) {
         [_internalOperation onUploadProgressChanged:^(double progress) {
             //Perform all callbacks in background queue
@@ -325,7 +325,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
 }
 
-- (void)onDownloadProgressChanged:(SFNetworkOperationProgressBlock)downloadProgressBlock {
+- (void)addDownloadProgressBlock:(SFNetworkOperationProgressBlock)downloadProgressBlock {
     if (_internalOperation) {
         [_internalOperation onDownloadProgressChanged:^(double progress) {
             //Perform all callbacks in background queue

@@ -13,6 +13,7 @@
  
 - SFNetworkOperationErrorTypeNetworkError: Network related error, including error code of kCFURLErrorNotConnectedToInternet, kCFURLErrorCannotFindHost, kCFURLErrorCannotConnectToHost, kCFURLErrorNetworkConnectionLost, kCFURLErrorDNSLookupFailed, kCFURLErrorResourceUnavailable and kCFURLErrorTimedOut
  
+- SFNetworkOperationErrorTypeInvalidRequest: Invalid request error code 400
 - SFNetworkOperationErrorTypeSessionTimeOut: Session time out error, error code 401
 - SFNetworkOperationErrorTypeOAuthError: OAuth related error. including error code of kSFOAuthErrorAccessDenied, kSFOAuthErrorInvalidClientId, kSFOAuthErrorInvalidGrant, kSFOAuthErrorInactiveUser and kSFOAuthErrorInactiveOrg
 - SFNetworkOperationErrorTypeAccessDenied: Access denied error, error code 403 
@@ -26,6 +27,7 @@ typedef enum {
     SFNetworkOperationErrorTypeSessionTimeOut,
     SFNetworkOperationErrorTypeOAuthError,
     SFNetworkOperationErrorTypeAccessDenied,
+    SFNetworkOperationErrorTypeInvalidRequest,
     SFNetworkOperationErrorTypeAPILimitReached,
     SFNetworkOperationErrorTypeURLNoLongerExists,
     SFNetworkOperationErrorTypeInternalServerError,
