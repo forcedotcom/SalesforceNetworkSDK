@@ -61,13 +61,20 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 @property (nonatomic, strong) SFOAuthCoordinator *coordinator;
 
+/** If plan to use `SFNetworkEngine` against a non-SFDC source, use remote host to initialize the `SFNetworkEngine` instead.
+ 
+    When initialized this way without setting coordinator, requiresAccessToken will be set 
+    to NO for `SFNetworkOperation`. Caller is responsible for using `customHeaders` to set necessary authorization header if needed
+*/
+@property (nonatomic, copy) NSString *remoteHost;
+
 /** Custom HTTP headers that will be set for all `SFNetworkOperation` before executing
  
  `SFNetworkEngine` will automatically set the following headers if customHeaders is nil or do not contain the specific header key
  - Authorization header with `[[SFOAuthCoordinator credentials] accessToken]`
  - User-Agent header with application name, version and OS information
  */
-@property (nonatomic, strong) NSDictionary *customHeaders;
+@property (nonatomic, copy) NSDictionary *customHeaders;
 
 /** Handler that you implement to monitor reachability changes
  
@@ -75,7 +82,11 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 @property (nonatomic, copy) void (^reachabilityChangedHandler)(SFNetworkStatus ns);
 
-/** Server API root path. In the case of salesforce REST API, apiPath could be /services/data/v25.0 etc. 
+
+/** Return current network status*/
+@property (nonatomic, assign, readonly) SFNetworkStatus networkStatus;
+
+/** Server API root path. In the case of salesforce REST API, apiPath could be /services/data/v25.0 etc.
  
  If this value is set and a relative URL is passed to `operationWithUrl`, `apiPath` will be used to construct the full URL. See `operationWithUrl` for details
  */
@@ -102,6 +113,7 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
 
 /**Set to true to suspend all pending requests when app enters background. Default is YES*/
 @property (nonatomic, assign, getter = shouldSuspendRequestsWhenAppEntersBackground) BOOL suspendRequestsWhenAppEntersBackground;
+
 
 /** Returns the singleton instance of `SFNetworkEngine`
  * After a successful oauth login with an SFOAuthCoordinator, you

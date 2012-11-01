@@ -66,6 +66,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 
 @implementation SFNetworkEngine
 @synthesize coordinator = _coordinator;
+@synthesize remoteHost = _remoteHost;
 @synthesize customHeaders = _customHeaders;
 @synthesize reachabilityChangedHandler = _reachabilityChangedHandler;
 @synthesize operationTimeout = _operationTimeout;
@@ -77,6 +78,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 @synthesize networkChangeShouldTriggerTokenRefresh = _networkChangeShouldTriggerTokenRefresh;
 @synthesize enableHttpPipeling = _enableHttpPipeling;
 @synthesize supportLocalTestData = _supportLocalTestData;
+@synthesize networkStatus = _networkStatus;
 
 #pragma mark - Initialization
 - (id)init {
@@ -136,6 +138,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         }
     }
     _coordinator = coordinator;
+    self.remoteHost = [_coordinator.credentials.instanceUrl host];
     if (!_internalNetworkEngine) {
         //If network engine is not created, create it
         [self internalNetworkEngine];
@@ -161,21 +164,20 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 - (MKNetworkEngine *)internalNetworkEngine {
     if (!_internalNetworkEngine) {
         //Assert the condition that has to be met
-        NSAssert(_coordinator != nil, @"SFOAuthCoordinator must be set first before invoke any network call.");
-        
-        SFOAuthCredentials *credentials = _coordinator.credentials;
-        NSString *currentHostName = [credentials.instanceUrl host];
+        NSAssert((_coordinator != nil || _remoteHost != nil), @"Either SFOAuthCoordinator or remoteHost must be set first before invoke any network call.");
         
         
-        _internalNetworkEngine = [[MKNetworkEngine alloc] initWithHostName:currentHostName customHeaderFields:[self customHeaders]];
+        _internalNetworkEngine = [[MKNetworkEngine alloc] initWithHostName:self.remoteHost customHeaderFields:[self customHeaders]];
         
         __weak SFNetworkEngine *weakSelf = self;
         _internalNetworkEngine.reachabilityChangedHandler =  ^ (NetworkStatus ns) {
             [weakSelf reachabilityChanged:ns];
         };
-
     }
     return _internalNetworkEngine;
+}
+- (SFNetworkStatus)networkStatus {
+    return _networkStatus;
 }
 
 #pragma mark - Http Header Method
@@ -208,15 +210,14 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     
     if (![lowerCaseUrl hasPrefix:@"http:"] && ![lowerCaseUrl hasPrefix:@"https:"]) {
         //relative URL, construct full URL
-        NSString *hostName = [[self.coordinator.credentials instanceUrl] host];
         NSString *scheme = useSSL ? @"https" : @"http";
         
         //If API path is nil or URL already starts with API path, construct with instanceUrl only
         if ([NSString isEmpty:self.apiPath] || [lowerCaseUrl hasPrefix:[self.apiPath lowercaseString]]) {
-            url = [NSString stringWithFormat:@"%@://%@/%@", scheme, hostName, url];
+            url = [NSString stringWithFormat:@"%@://%@/%@", scheme, self.remoteHost, url];
         }
         else {
-            url = [NSString stringWithFormat:@"%@://%@/%@/%@",scheme, hostName, self.apiPath, url];
+            url = [NSString stringWithFormat:@"%@://%@/%@/%@",scheme, self.remoteHost, self.apiPath, url];
         }
     }
     else {
@@ -287,6 +288,10 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (nil == operation || nil == operation.internalOperation) {
         return;
     }
+    if (nil == self.coordinator) {
+        //if coordinator is nil, set requiresAccessToken to NO
+        operation.requiresAccessToken = NO;
+    }
     
     @synchronized(self) {
         if (self.isAccessTokenBeingRefreshed) {
@@ -298,7 +303,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     }
     
     //Make sure authorization header is up-to-date
-    if (operation.requiresAccessToken) {
+    if (operation.requiresAccessToken && self.coordinator) {
         NSString *token = [NSString stringWithFormat:kAuthoriationHeader, self.coordinator.credentials.accessToken];
         [operation setHeaderValue:token forKey:kAuthoriationHeaderKey];
     }
@@ -467,6 +472,8 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 
 #pragma mark - Reachability Methods
 - (void)reachabilityChanged:(NetworkStatus)ns {
+    _networkStatus = ns;
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:SFNetworkOperationReachabilityChangedNotification object:[NSNumber numberWithInt:ns] userInfo:nil];
     if (self.reachabilityChangedHandler) {
         self.reachabilityChangedHandler(ns);
@@ -625,6 +632,10 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     [tempView addSubview:view];
 }
 
+- (void)oauthCoordinatorDidAuthenticate:(SFOAuthCoordinator *)coordinator {
+    [self oauthCoordinatorDidAuthenticate:coordinator authInfo:nil];
+}
+
 - (void)oauthCoordinatorDidAuthenticate:(SFOAuthCoordinator *)coordinator authInfo:(SFOAuthInfo *)info {
     NSLog(@"oauthCoordinatorDidAuthenticate");
     // the token exchange worked.
@@ -634,6 +645,10 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     
     //mark the stop of the refrsh access token flow
     [self refreshAccessTokenFlowStopped:NO];
+}
+
+- (void)oauthCoordinator:(SFOAuthCoordinator *)coordinator didFailWithError:(NSError *)error  {
+    [self oauthCoordinator:coordinator didFailWithError:error authInfo:nil];
 }
 
 - (void)oauthCoordinator:(SFOAuthCoordinator *)coordinator didFailWithError:(NSError *)error authInfo:(SFOAuthInfo *)info {
