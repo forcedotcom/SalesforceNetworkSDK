@@ -14,7 +14,6 @@
 #import "SFNetworkOperation+Internal.h"
 #import "SFNetworkEngine+Internal.h"
 #import "SFNetworkUtils.h"
-#import "SFOAuthInfo.h"
 
 #pragma mark - Operation Method
 NSString * const SFNetworkOperationGetMethod = @"GET";
@@ -633,10 +632,6 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 }
 
 - (void)oauthCoordinatorDidAuthenticate:(SFOAuthCoordinator *)coordinator {
-    [self oauthCoordinatorDidAuthenticate:coordinator authInfo:nil];
-}
-
-- (void)oauthCoordinatorDidAuthenticate:(SFOAuthCoordinator *)coordinator authInfo:(SFOAuthInfo *)info {
     NSLog(@"oauthCoordinatorDidAuthenticate");
     // the token exchange worked.
     
@@ -647,11 +642,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     [self refreshAccessTokenFlowStopped:NO];
 }
 
-- (void)oauthCoordinator:(SFOAuthCoordinator *)coordinator didFailWithError:(NSError *)error  {
-    [self oauthCoordinator:coordinator didFailWithError:error authInfo:nil];
-}
-
-- (void)oauthCoordinator:(SFOAuthCoordinator *)coordinator didFailWithError:(NSError *)error authInfo:(SFOAuthInfo *)info {
+- (void)oauthCoordinator:(SFOAuthCoordinator *)coordinator didFailWithError:(NSError *)error   {
     NSLog(@"oauthCoordinator:didFailWithError: %@", error);
     if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeOAuthError) {
         //OAuth error occurs
