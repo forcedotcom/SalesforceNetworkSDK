@@ -436,7 +436,6 @@ static NSOperationQueue *_sharedNetworkQueue;
         // This operation is already being processed
         if (index < _sharedNetworkQueue.operations.count) {
           MKNetworkOperation *queuedOperation = (MKNetworkOperation*) [_sharedNetworkQueue.operations objectAtIndex:index];
-            NSLog(@"already queued %@", [queuedOperation curlCommandLineString]);
           [queuedOperation updateHandlersFromOperation:operation];
         }
       }

@@ -908,10 +908,6 @@
             
             [self.request setHTTPBody:[self bodyData]];
         }
-        if (self.dataToBePosted.count > 0){
-            NSLog(@"send request with %@",  [self.request allHTTPHeaderFields]);
-        }
-        
         dispatch_async(dispatch_get_main_queue(), ^{
             self.connection = [[NSURLConnection alloc] initWithRequest:self.request
                                                               delegate:self
@@ -1468,7 +1464,6 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
 }
 
 - (long long) contentLength {
-    //NSLog(@"%lld, %lld", [self.response expectedContentLength], self.expectedContentSize);
     return (self.expectedContentSize > 0) ? self.expectedContentSize : [self.response expectedContentLength ];
 }
 
