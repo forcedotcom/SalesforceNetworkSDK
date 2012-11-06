@@ -314,6 +314,9 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         [operation.internalOperation setLocalTestData:fileData];
     }
     
+    //add no cache header Cache-control: no-cache, no-store
+    [operation setHeaderValue:@"no-cache, no-store" forKey:@"Cache-control"];
+    
     MKNetworkEngine *engine = [self internalNetworkEngine];
     [engine enqueueOperation:operation.internalOperation forceReload:YES];
 }
