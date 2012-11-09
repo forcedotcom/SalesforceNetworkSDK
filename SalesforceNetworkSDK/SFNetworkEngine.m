@@ -331,7 +331,8 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
     NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
     for (MKNetworkOperation *operation in operations) {
-        if (!operation.isFinished) {
+        if ([operation isCacheable] && !operation.isFinished) {
+            //only cancel cacheable operation, which means GET only
             [operation cancel];
         }
     }
