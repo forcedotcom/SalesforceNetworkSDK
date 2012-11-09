@@ -54,6 +54,12 @@
  */
 - (NSError *)checkForErrorInResponse:(MKNetworkOperation *)operation;
 
+/** Check for errorCode returned in JSON response from server
+ @param  responseStr Server response str
+ */
+- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr;
+
+
 /** Return YES if should automatically retry the operation on network error
  
  @param operation Operation to check for retry
