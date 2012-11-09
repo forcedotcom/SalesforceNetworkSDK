@@ -209,9 +209,10 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"uniqueIdentifier = %@", operationIdentifier];
     NSArray *operations = [[engine operations] filteredArrayUsingPredicate:predicate];
     for (MKNetworkOperation *operation in operations) {
-        if (!operation.isFinished) {
+        if ([operation isCacheable] && !operation.isFinished) {
+            //only cancel cacheable operation, which means GET only
             [operation cancel];
-            
+                
             //cancel download file if applicable
             [[self class] deleteUnfinishedDownloadFileForOperation:operation];
         }
