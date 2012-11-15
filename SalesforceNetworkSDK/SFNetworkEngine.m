@@ -313,6 +313,9 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         [operation.internalOperation setLocalTestData:fileData];
     }
     
+    //add no cache header Cache-control: no-cache, no-store
+    [operation setHeaderValue:@"no-cache, no-store" forKey:@"Cache-control"];
+    
     MKNetworkEngine *engine = [self internalNetworkEngine];
     [engine enqueueOperation:operation.internalOperation forceReload:YES];
 }
@@ -331,7 +334,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
     NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
     for (MKNetworkOperation *operation in operations) {
-        if ([operation isCacheable] && !operation.isFinished) {
+        if (!operation.isFinished) {
             //only cancel cacheable operation, which means GET only
             [operation cancel];
         }

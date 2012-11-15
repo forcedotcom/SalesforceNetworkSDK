@@ -201,7 +201,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             }
         });
     }
-
+    
     //Locate existing operations that are already in the queue
     //with the same unique ID
     MKNetworkEngine *engine = [[SFNetworkEngine sharedInstance] internalNetworkEngine];
@@ -209,7 +209,8 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"uniqueIdentifier = %@", operationIdentifier];
     NSArray *operations = [[engine operations] filteredArrayUsingPredicate:predicate];
     for (MKNetworkOperation *operation in operations) {
-        if (!operation.isFinished) {
+        if ([operation isCacheable] && !operation.isFinished) {
+            //only cancel cacheable operation, which means GET only
             [operation cancel];
             
             //cancel download file if applicable
@@ -277,6 +278,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                 };
             });
         } onError:^(NSError *error) {
+            NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString];
+            if (serviceError) {
+                error = serviceError;
+            }
+            
             if (weakSelf.requiresAccessToken && [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeSessionTimeOut) {
                 //do nothing, queueOperationOnExpiredAccessToken is handled in callDelegateDidFailWithError
                 [weakSelf log:SFLogLevelError format:@"Session time out encountered. Actual error: [%@]. Will be retried in callDelegateDidFailWithError", [error localizedDescription]];
@@ -394,7 +400,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
             NSError *error = [weakSelf checkForErrorInResponse:operation];
             if (nil != error) {
-                [weakSelf callDelegateDidFinish:operation];
+                [weakSelf callDelegateDidFailWithError:error];
             }
             else {
                 weakSelf.internalOperation = operation;
@@ -409,6 +415,10 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return;
     }
     
+    NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString];
+    if (serviceError) {
+        error = serviceError;
+    }
     [self log:SFLogLevelError format:@"callDelegateDidFailWithError %@", error];
     __weak SFNetworkOperation *weakSelf = self;
     [[self class] deleteUnfinishedDownloadFileForOperation:weakSelf.internalOperation];
@@ -418,7 +428,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:weakSelf];
         return;
     }
-   
+    
     
     if ([weakSelf shouldRetryOperation:weakSelf onNetworkError:error]) {
         [weakSelf log:SFLogLevelError msg:@"Network error encountered. Automatically retry starts"];
@@ -433,7 +443,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             //Permission denied error
             //Server side sometimes return 403 with JSON object to
             //indicate permission denied error
-            NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
+            NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString];
             if (potentialError) {
                 error = potentialError;
             }
@@ -468,11 +478,17 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return nil;
     }
     NSString *responseStr = [operation responseString];
+    
+    return [self checkForErrorInResponseStr:responseStr];
+}
+
+- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr {
     if (nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
         //Not JSON format
         return nil;
     }
-    id jsonResponse = [operation responseJSON];
+    
+    id jsonResponse = [self responseAsJSON];
     if (jsonResponse && [jsonResponse isKindOfClass:[NSArray class]]) {
         if ([jsonResponse count] == 1) {
             id potentialError = [jsonResponse objectAtIndex:0];

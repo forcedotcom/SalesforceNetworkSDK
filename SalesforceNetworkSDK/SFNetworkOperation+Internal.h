@@ -21,22 +21,22 @@
  */
 @property (nonatomic, readonly, copy) NSString *customPostDataEncodingContentType;
 
-/** Current number of retries due to network error. 
+/** Current number of retries due to network error.
  
  When this number is equal to `maximumNumOfRetriesForNetworkError`, operation will not be retried again if it failed on network error and error block will be invoke on a background thread instead
-*/
+ */
 @property (nonatomic, assign) NSUInteger numOfRetriesForNetworkError;
 
 /**Create new SFNetworkOperation
  
-@param operation MKNetworkOperation object. Class for handling the low level network calls
-@param url URL string used to created the operation
-@param method HTTP method
-@param useSSL YES to use SSL
+ @param operation MKNetworkOperation object. Class for handling the low level network calls
+ @param url URL string used to created the operation
+ @param method HTTP method
+ @param useSSL YES to use SSL
  */
 - (id)initWithOperation:(MKNetworkOperation *)operation url:(NSString *)url method:(NSString *)method ssl:(BOOL)useSSL;
 
-/** Invoke delegate's operationDidFinish callback 
+/** Invoke delegate's operationDidFinish callback
  */
 - (void)callDelegateDidFinish:(MKNetworkOperation *)operation;
 
@@ -46,13 +46,19 @@
 
 /** Check for errorCode returned in JSON response from server
  
- In case of failed API call, serve sometimes would return an JSON array with one single JSON object to represent the error. This JSON error object has an "errorCode" property to outline the reason of failed call. 
+ In case of failed API call, serve sometimes would return an JSON array with one single JSON object to represent the error. This JSON error object has an "errorCode" property to outline the reason of failed call.
  
- To handle this use case, this method will check to see if operation conains a JSON response, if yes, whether it matches the pattern described above. If an error code is detected, it will create an NSError object with `[NSError userInfo]` set to the error JSON object returned from server 
+ To handle this use case, this method will check to see if operation conains a JSON response, if yes, whether it matches the pattern described above. If an error code is detected, it will create an NSError object with `[NSError userInfo]` set to the error JSON object returned from server
  
  @param operation Network operation which contains the raw server response
  */
 - (NSError *)checkForErrorInResponse:(MKNetworkOperation *)operation;
+
+/** Check for errorCode returned in JSON response from server
+ @param  responseStr Server response str
+ */
+- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr;
+
 
 /** Return YES if should automatically retry the operation on network error
  

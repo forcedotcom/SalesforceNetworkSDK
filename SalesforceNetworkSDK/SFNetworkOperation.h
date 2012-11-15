@@ -56,7 +56,7 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
  
  See `SFNetworkOperationErrorType` for details on the logic of detecting network error
  
- Because there is a slight chance that due to unstable connectivity operation can error out after server side 
+ Because there is a slight chance that due to unstable connectivity operation can error out after server side
  receives the response and before operation can get a valid response back. You need to be careful when setting
  this property to YES and be aware of possible duplication requests if auto retry is turned on.
  */
@@ -68,9 +68,9 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
 
 /** Set this property to enable SFNetworkOperation to read test data from a local file
  
- This feature is useful to simulate server side response using a local mock up data file for testing purpose. 
+ This feature is useful to simulate server side response using a local mock up data file for testing purpose.
  `[SFNetworkEngine supportLocalTestData]` needs to be set to YES for this property to take effect
-*/
+ */
 @property (nonatomic, copy) NSString *localTestDataPath;
 
 /** Returns the HTTP method for this operation
@@ -78,7 +78,7 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
 @property (nonatomic, readonly, copy) NSString *method;
 
 /** Returns YES if use SSL
-*/
+ */
 @property (nonatomic, readonly, assign) BOOL useSSL;
 
 /** Request URL Property
@@ -117,7 +117,7 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
 
 /**Set path to store downloaded content
  
-Path to store downloaded content. If this value is set, all content downloaded by this operation will be stored at the path specified. And  if `encryptDownloadedFile` is set to true, file content will be encrypted
+ Path to store downloaded content. If this value is set, all content downloaded by this operation will be stored at the path specified. And  if `encryptDownloadedFile` is set to true, file content will be encrypted
  */
 @property (nonatomic, copy) NSString *pathToStoreDownloadedContent;
 
@@ -172,7 +172,7 @@ Path to store downloaded content. If this value is set, all content downloaded b
 ///---------------------------------------------------------------
 /** Add block Handler for completion
  
- An operation can have multiple completion and error blocks attached to it. 
+ An operation can have multiple completion and error blocks attached to it.
  When the operation completes successfully and operation response is not a JSON array with single JSON error object, each registered completion block will be executed on a background thread.
  When operation errors out or operation response is a JSON array with single JSON error object, each registered error block will be executed on a background thread. Completion block will not be invoked when errorBlock is invoked
  @param completionBlock Completion block to be invoked when operation is completed successfully
@@ -183,7 +183,7 @@ Path to store downloaded content. If this value is set, all content downloaded b
 
 /** Add block Handler for cancel
  
- An operation can have multiple cancel blocks attached to it. When an operation is cancelled each registered block will be executed on a background thread. 
+ An operation can have multiple cancel blocks attached to it. When an operation is cancelled each registered block will be executed on a background thread.
  @param cancelBlock Error block to be invoked when operation is cancelled
  */
 - (void)addCancelBlock:(SFNetworkOperationCancelBlock)cancelBlock;
