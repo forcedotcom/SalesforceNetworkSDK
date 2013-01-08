@@ -212,7 +212,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         if ([operation isCacheable] && !operation.isFinished) {
             //only cancel cacheable operation, which means GET only
             [operation cancel];
-            
+                
             //cancel download file if applicable
             [[self class] deleteUnfinishedDownloadFileForOperation:operation];
         }
