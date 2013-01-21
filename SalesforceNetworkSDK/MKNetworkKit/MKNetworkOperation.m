@@ -813,15 +813,22 @@
     }];
     
     [self.dataToBePosted enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        
         NSDictionary *thisDataObject = (NSDictionary*) obj;
-        NSString *thisFieldString = [NSString stringWithFormat:
-                                     @"--%@\r\nContent-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\nContent-Type: %@\r\nContent-Transfer-Encoding: binary\r\n\r\n",
-                                     boundary,
-                                     [thisDataObject objectForKey:@"name"],
-                                     [thisDataObject objectForKey:@"filename"],
-                                     [thisDataObject objectForKey:@"mimetype"]];
-        
+        NSString *thisFieldString = nil;
+        if (nil != [thisDataObject objectForKey:@"filename"]) {
+            thisFieldString = [NSString stringWithFormat:
+                               @"--%@\r\nContent-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\nContent-Type: %@\r\nContent-Transfer-Encoding: binary\r\n\r\n",
+                               boundary,
+                               [thisDataObject objectForKey:@"name"],
+                               [thisDataObject objectForKey:@"filename"],
+                               [thisDataObject objectForKey:@"mimetype"]];
+        } else {
+            thisFieldString = [NSString stringWithFormat:
+                               @"--%@\r\nContent-Disposition: form-data; name=\"%@\"\r\nContent-Type: %@\r\n\r\n",
+                               boundary,
+                               [thisDataObject objectForKey:@"name"],
+                               [thisDataObject objectForKey:@"mimetype"]];
+        }
         [body appendData:[thisFieldString dataUsingEncoding:[self stringEncoding]]];
         [body appendData:[thisDataObject objectForKey:@"data"]];
         [body appendData:[@"\r\n" dataUsingEncoding:[self stringEncoding]]];
