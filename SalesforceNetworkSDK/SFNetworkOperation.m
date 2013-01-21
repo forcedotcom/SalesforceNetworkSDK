@@ -349,7 +349,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     if (fileData == nil) {
         return;
     }
-    if ([NSString isEmpty:fileName]) {
+    if ([NSString isEmpty:paramName]) {
         return;
     }
     if (nil == mimeType) {

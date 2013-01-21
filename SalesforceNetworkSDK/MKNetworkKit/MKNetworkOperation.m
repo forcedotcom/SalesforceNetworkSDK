@@ -815,12 +815,22 @@
     [self.dataToBePosted enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
         
         NSDictionary *thisDataObject = (NSDictionary*) obj;
-        NSString *thisFieldString = [NSString stringWithFormat:
-                                     @"--%@\r\nContent-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\nContent-Type: %@\r\nContent-Transfer-Encoding: binary\r\n\r\n",
-                                     boundary,
-                                     [thisDataObject objectForKey:@"name"],
-                                     [thisDataObject objectForKey:@"filename"],
-                                     [thisDataObject objectForKey:@"mimetype"]];
+        NSString *thisFieldString = nil;
+        if (nil != [thisDataObject objectForKey:@"filename"]) {
+            thisFieldString = [NSString stringWithFormat:
+             @"--%@\r\nContent-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\nContent-Type: %@\r\nContent-Transfer-Encoding: binary\r\n\r\n",
+             boundary,
+             [thisDataObject objectForKey:@"name"],
+             [thisDataObject objectForKey:@"filename"],
+             [thisDataObject objectForKey:@"mimetype"]];
+        } else {
+            thisFieldString = [NSString stringWithFormat:
+                               @"--%@\r\nContent-Disposition: form-data; name=\"%@\"\r\nContent-Type: %@\r\n\r\n",
+                               boundary,
+                               [thisDataObject objectForKey:@"name"],
+                               [thisDataObject objectForKey:@"mimetype"]];
+        }
+        
         
         [body appendData:[thisFieldString dataUsingEncoding:[self stringEncoding]]];
         [body appendData:[thisDataObject objectForKey:@"data"]];
@@ -841,7 +851,8 @@
         [self.request setValue:[NSString stringWithFormat:@"%d", [body length]] forHTTPHeaderField:@"Content-Length"];
     }
     
-    
+//    NSString *dataInStr = [[NSString alloc] initWithData:body encoding:NSASCIIStringEncoding];
+//    NSLog(@"body data is %@", dataInStr);
     return body;
 }
 
@@ -1072,23 +1083,13 @@
             }
             else if(result == kSecTrustResultConfirm) {
                 
-                // ask user
-                BOOL userOkWithWrongCert = NO; // (ACTUALLY CHEAT., DON'T BE A F***ING BROWSER, USERS ALWAYS TAP YES WHICH IS RISKY)
-                if(userOkWithWrongCert) {
-                    
-                    // Cert not trusted, but user is OK with that
-                    [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
-                } else {
-                    
-                    // Cert not trusted, and user is not OK with that. Don't proceed
-                    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
-                }
+                DLog(@"Certificate is not trusted, continuing without credentials. Might result in 401 Unauthorized");
+                [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
             }
             else {
                 
-                // invalid or revoked certificate
-                [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
-                //[challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+                DLog(@"Certificate is invalid, continuing without credentials. Might result in 401 Unauthorized");
+                [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
             }
         }
         else if (self.authHandler) {
