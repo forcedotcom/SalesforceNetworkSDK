@@ -496,14 +496,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             if ([potentialError isKindOfClass:[NSDictionary class]]) {
                 NSString *potentialErrorCode = [potentialError objectForKey:kErrorCodeKeyInResponse];
                 if (nil != potentialErrorCode) {
-                    
-                    NSInteger code = kFailedWithServerReturnedErrorCode;
-                    if([potentialErrorCode isEqualToString:@"INSUFFICIENT_ACCESS"]) {
-                        code = 403;
-                    }
-                    
-                    // we have an error
-                    NSError *error = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:code userInfo:potentialError];
+                        NSError *error = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:kFailedWithServerReturnedErrorCode userInfo:potentialError];
                     return error;
                 }
             }

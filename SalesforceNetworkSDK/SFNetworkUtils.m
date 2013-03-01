@@ -79,14 +79,15 @@ NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";
         return NO;
     }
     
+    //Check for INVALID_SESSION
     id obj = [[error userInfo] objectForKey:kErrorCodeKeyInResponse];
     if(obj) {
-        if (![obj rangeOfString:kErrorCodeKeyInResponse].location == NSNotFound) {
+        if (![obj rangeOfString:kInvalidSessionID].location == NSNotFound) {
             return YES;
         }
     }
     
-    if (error.code == 401) {
+    if (error.code == 401 || error.code == kCFURLErrorUserCancelledAuthentication) {
         return YES;
     } else {
         return NO;
