@@ -10,6 +10,10 @@
 #import "SalesforceCommonUtils.h"
 #import "SFOAuthCoordinator.h"
 
+NSString * const kErrorCodeKeyInResponse = @"errorCode";
+NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";
+
+
 @interface SFNetworkUtils ()
 /** Return YES if error is related to network connectivity error
  
@@ -74,6 +78,14 @@
     if (nil == error) {
         return NO;
     }
+    
+    id obj = [[error userInfo] objectForKey:kErrorCodeKeyInResponse];
+    if(obj) {
+        if (![obj rangeOfString:kErrorCodeKeyInResponse].location == NSNotFound) {
+            return YES;
+        }
+    }
+    
     if (error.code == 401) {
         return YES;
     } else {
@@ -114,4 +126,5 @@
     }
     return SFNetworkOperationErrorTypeUnknown;
 }
+
 @end

@@ -70,6 +70,9 @@
 		10B761851612776000B3CD58 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		10C7513F16151E98008139FD /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		10C7514016151E98008139FD /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		CB893A1216A4CCDE00B1A2F2 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
+		CB893A1516A4CCF200B1A2F2 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		CB893A1716A4CCF900B1A2F2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +123,9 @@
 		1090C52A161275BF0054B040 = {
 			isa = PBXGroup;
 			children = (
+				CB893A1716A4CCF900B1A2F2 /* CoreData.framework */,
+				CB893A1516A4CCF200B1A2F2 /* CFNetwork.framework */,
+				CB893A1216A4CCDE00B1A2F2 /* libicucore.dylib */,
 				1090C53A161275BF0054B040 /* SalesforceNetworkSDK */,
 				1090C537161275BF0054B040 /* Frameworks */,
 				1090C536161275BF0054B040 /* Products */,

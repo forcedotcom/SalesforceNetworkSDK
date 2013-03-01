@@ -14,7 +14,6 @@
 #import "SFNetworkUtils.h"
 
 static NSString *kDefaultFileDataMimeType = @"multipart/form-data";
-static NSString *kErrorCodeKeyInResponse = @"errorCode";
 static NSString *kSFNetworkOperationErrorDomain = @"com.salesforce.SFNetworkSDK.ErrorDomain";
 static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 
@@ -298,6 +297,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                 if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
                     //Permission denied error
                     NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
+                    
                     if (potentialError) {
                         error = potentialError;
                     }
@@ -488,6 +488,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return nil;
     }
     
+    
     id jsonResponse = [self responseAsJSON];
     if (jsonResponse && [jsonResponse isKindOfClass:[NSArray class]]) {
         if ([jsonResponse count] == 1) {
@@ -495,8 +496,14 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             if ([potentialError isKindOfClass:[NSDictionary class]]) {
                 NSString *potentialErrorCode = [potentialError objectForKey:kErrorCodeKeyInResponse];
                 if (nil != potentialErrorCode) {
+                    
+                    NSInteger code = kFailedWithServerReturnedErrorCode;
+                    if([potentialErrorCode isEqualToString:@"INSUFFICIENT_ACCESS"]) {
+                        code = 403;
+                    }
+                    
                     // we have an error
-                    NSError *error = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:kFailedWithServerReturnedErrorCode userInfo:potentialError];
+                    NSError *error = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:code userInfo:potentialError];
                     return error;
                 }
             }

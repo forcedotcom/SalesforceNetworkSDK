@@ -34,6 +34,8 @@ typedef enum {
     SFNetworkOperationErrorTypeUnknown
 } SFNetworkOperationErrorType;
 
+extern NSString * const kErrorCodeKeyInResponse;
+
 /** Helper class for SFNetworkSDK 
  
  This class provides
