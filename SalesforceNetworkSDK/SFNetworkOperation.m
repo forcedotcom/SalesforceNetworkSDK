@@ -44,6 +44,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     self = [super init];
     if (self) {
         _internalOperation = operation;
+        
         _cancelBlocks = [[NSMutableArray alloc] init];
         _useSSL = useSSL;
         _method = method;
@@ -277,7 +278,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                 };
             });
         } onError:^(NSError *error) {
-            NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString];
+            NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
             if (serviceError) {
                 error = serviceError;
             }
@@ -415,10 +416,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return;
     }
     
-    NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString];
+    NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
     if (serviceError) {
         error = serviceError;
     }
+    
     [self log:SFLogLevelError format:@"callDelegateDidFailWithError %@", error];
     __weak SFNetworkOperation *weakSelf = self;
     [[self class] deleteUnfinishedDownloadFileForOperation:weakSelf.internalOperation];
@@ -443,7 +445,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             //Permission denied error
             //Server side sometimes return 403 with JSON object to
             //indicate permission denied error
-            NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString];
+            NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString withError:error];
             if (potentialError) {
                 error = potentialError;
             }
@@ -479,13 +481,13 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
     NSString *responseStr = [operation responseString];
     
-    return [self checkForErrorInResponseStr:responseStr];
+    return [self checkForErrorInResponseStr:responseStr withError:operation.error];
 }
 
-- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr {
-    if (nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
+- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr withError:(NSError * )error {
+    if (error || nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
         //Not JSON format
-        return nil;
+        return error;
     }
     
     

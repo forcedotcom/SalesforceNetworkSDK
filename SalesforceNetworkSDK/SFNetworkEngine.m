@@ -229,6 +229,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     SFNetworkOperation *operation = [[SFNetworkOperation alloc] initWithOperation:internalOperation url:url method:method ssl:useSSL];
     operation.operationTimeout = self.operationTimeout;
     operation.customHeaders = self.customHeaders;
+   
     return operation;
 }
 
