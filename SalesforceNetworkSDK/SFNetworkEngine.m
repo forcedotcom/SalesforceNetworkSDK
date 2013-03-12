@@ -619,15 +619,13 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         
         // Check for access token and if there is not any then move the operation to the waiting for token queue.
         NSString* accessToken = self.coordinator.credentials.accessToken;
-        if(!accessToken) {
-            for(SFNetworkOperation * operation in safeCopy) {
-                if(operation.requiresAccessToken) {
-                    [self.operationsWaitingForAccessToken addObject:operation];
-                }
+        for(SFNetworkOperation * operation in safeCopy) {
+            if(!accessToken && operation.requiresAccessToken) {
+                [self.operationsWaitingForAccessToken addObject:operation];
             }
-            
-            [safeCopy removeObjectsInArray:self.operationsWaitingForAccessToken];
         }
+            
+        [safeCopy removeObjectsInArray:self.operationsWaitingForAccessToken];
     }
     
     for (SFNetworkOperation *operation in safeCopy) {
