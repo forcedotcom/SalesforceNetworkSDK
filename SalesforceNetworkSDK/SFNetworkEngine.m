@@ -90,6 +90,8 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         _supportLocalTestData = NO;
         _operationsWaitingForAccessToken = [[NSMutableArray alloc] init];
         
+        _operationsWaitingForNetwork = [[NSMutableArray alloc] init];
+        
         //Monitor application enters and exist background
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(appEnteredBackground:)
@@ -605,13 +607,27 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 }
 
 - (void)replayOperationsWaitingForNetwork {
-    NSArray *safeCopy = nil;
+    NSMutableArray *safeCopy = nil;
     @synchronized(self) {
         if (self.operationsWaitingForNetwork.count == 0) {
             return;
         }
-        safeCopy = [self.operationsWaitingForNetwork copy];
+        
+        safeCopy = [NSMutableArray  arrayWithArray:[self.operationsWaitingForNetwork copy]];
+        
         [self.operationsWaitingForNetwork removeAllObjects];
+        
+        // Check for access token and if there is not any then move the operation to the waiting for token queue.
+        NSString* accessToken = self.coordinator.credentials.accessToken;
+        if(!accessToken) {
+            for(SFNetworkOperation * operation in safeCopy) {
+                if(operation.requiresAccessToken) {
+                    [self.operationsWaitingForAccessToken addObject:operation];
+                }
+            }
+            
+            [safeCopy removeObjectsInArray:self.operationsWaitingForAccessToken];
+        }
     }
     
     for (SFNetworkOperation *operation in safeCopy) {

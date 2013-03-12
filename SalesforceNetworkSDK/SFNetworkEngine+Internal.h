@@ -85,10 +85,6 @@
  */
 - (void)queueOperationOnExpiredAccessToken:(SFNetworkOperation *)operation;
 
-/** Replay all operations stored in `operationsWaitingForAccessToken` queue
- */
-- (void)replayOperationsWaitingForAccessToken;
-
 /** Fatal OAuth error happened. Call error block of all operations stored in `operationsWaitingForAccessToken` queue
  */
 - (void)failOperationsWaitingForAccessTokenWithError:(NSError *)error;

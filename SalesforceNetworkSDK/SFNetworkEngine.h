@@ -234,4 +234,8 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  @param operationTag Operation tag
  */
 - (BOOL)hasPendingOperationsWithTag:(NSString *)operationTag;
+
+/** Replay all operations stored in `operationsWaitingForAccessToken` queue
+ */
+- (void)replayOperationsWaitingForAccessToken;
 @end
