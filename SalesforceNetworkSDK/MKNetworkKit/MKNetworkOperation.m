@@ -24,7 +24,6 @@
 //  THE SOFTWARE.
 
 #import "MKNetworkKit.h"
-#import "SalesforceCommonUtils.h"
 
 #ifdef __OBJC_GC__
 #error MKNetworkKit does not support Objective-C Garbage Collection

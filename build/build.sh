@@ -116,31 +116,23 @@ function gen_headers() {
         usage "Generating headers needs to be run from within an Xcode shell environment"
     fi
 
-    # 'DerivedData' in the BUILT_PRODUCTS_DIR path probably indicates that we're building from within the Xcode IDE 
-    # (as opposed to from the command line via xcodebuild), therefore output the combined headers to the DerivedData
-    # path (such as the example below); otherwise output the combined headers to the 'artifacts' path.
-     
-    if [[ "$BUILT_PRODUCTS_DIR" =~ '/DerivedData/' ]]; then
-        H=$BUILT_PRODUCTS_DIR
-        H=`(cd $H/..; echo $PWD)`
-    else
-        H=$INSTALL_ROOT                    # i.e. ChatterSDK/build/artifacts/$configuration-$sdk/Headers
+	inH=$CONFIGURATION_BUILD_DIR/Headers
+    outH=$BUILT_PRODUCTS_DIR/Headers
+    DATE=$(date +"%e/%m/%y")
+    info "Generating headers $H"
+
+    if [[ $mode = "SalesforceNetworkSDK" ]] ; then
+        headers="SalesforceNetworkSDK SalesforceNetworkSDKPrivate"
     fi
-    
-    
-    H=$H/Headers
-    
-    headers=$mode
-    
+ 
 	for target in $headers; do
-        if [ $H/$target.h -nt $PROJECT_FILE_PATH/project.pbxproj ]; then
-            warn "Skipping $target since it is up-to-date"
+        mkdir -p $outH/$target
+        if [ $outH/$target/$target.h -nt $PROJECT_FILE_PATH/project.pbxproj ]; then
+            warn "Skipping $target since $outH/$target/$target.h is up-to-date"
             continue
         fi
         
-        echo "Generating headers $H/$target.h"
-        
-        cat <<EOF > $H/$target.h
+        cat <<EOF > $outH/$target/$target.h
         
 //
 //  $target.h
@@ -151,9 +143,14 @@ function gen_headers() {
 //
 
 EOF
-    for file in $(find $H/$target -type f); do
-        echo $file | sed -E "s%$H/%#import \"%" | sed -E 's/$/"/' >> $H/$target.h
+    for file in $(find $inH/$target -type f); do
+        filename=$(basename $file)
+        if [[ $filename == "$target.h" ]]; then
+            continue;
+        fi
+        echo "#import \"$filename\"" >> $inH/$target/$target.h
     done
+    
 done
     
 }

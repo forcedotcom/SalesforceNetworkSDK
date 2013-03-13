@@ -7,8 +7,6 @@
 //
 
 #import "SFNetworkUtils.h"
-#import "SalesforceCommonUtils.h"
-#import "SFOAuthCoordinator.h"
 
 NSString * const kErrorCodeKeyInResponse = @"errorCode";
 NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";

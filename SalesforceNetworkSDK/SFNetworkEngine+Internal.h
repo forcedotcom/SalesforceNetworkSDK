@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SFNetworkOperation.h"
 #import "SFNetworkEngine.h"
-#import "SFOAuthCoordinator.h"
+
 @interface SFNetworkEngine () <SFOAuthCoordinatorDelegate>
 
 @property (nonatomic, strong) MKNetworkEngine *internalNetworkEngine;
