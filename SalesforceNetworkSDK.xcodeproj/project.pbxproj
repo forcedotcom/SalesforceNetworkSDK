@@ -29,9 +29,9 @@
 		100F54851614EAAA00FD5EB8 /* MKNetworkOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54731614EAAA00FD5EB8 /* MKNetworkOperation.h */; };
 		100F54861614EAAA00FD5EB8 /* MKNetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54741614EAAA00FD5EB8 /* MKNetworkOperation.m */; };
 		100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */; };
-		101160A316F2386600B21B17 /* SFOAuthCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1011609E16F2386500B21B17 /* SFOAuthCoordinator.h */; };
-		101160A416F2386600B21B17 /* SFOAuthCredentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 1011609F16F2386500B21B17 /* SFOAuthCredentials.h */; };
-		101160A516F2386600B21B17 /* SFOAuthInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 101160A016F2386500B21B17 /* SFOAuthInfo.h */; };
+		101160A316F2386600B21B17 /* SFOAuthCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1011609E16F2386500B21B17 /* SFOAuthCoordinator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		101160A416F2386600B21B17 /* SFOAuthCredentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 1011609F16F2386500B21B17 /* SFOAuthCredentials.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		101160A516F2386600B21B17 /* SFOAuthInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 101160A016F2386500B21B17 /* SFOAuthInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */; };
 		1090C539161275BF0054B040 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1090C538161275BF0054B040 /* Foundation.framework */; };
 		10B761821612775400B3CD58 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761811612775400B3CD58 /* Security.framework */; };
