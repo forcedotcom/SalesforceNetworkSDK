@@ -7,7 +7,6 @@
 //
 
 #import "SFNetworkUtils.h"
-#import "SalesforceCommonUtils.h"
 #import "SFOAuthCoordinator.h"
 
 @interface SFNetworkUtils ()

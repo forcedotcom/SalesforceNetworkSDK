@@ -29,11 +29,11 @@
 		100F54851614EAAA00FD5EB8 /* MKNetworkOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54731614EAAA00FD5EB8 /* MKNetworkOperation.h */; };
 		100F54861614EAAA00FD5EB8 /* MKNetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54741614EAAA00FD5EB8 /* MKNetworkOperation.m */; };
 		100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */; };
+		10213A4F16F21F8700FAF087 /* SFOAuthCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 10213A4B16F21F8700FAF087 /* SFOAuthCoordinator.h */; };
+		10213A5016F21F8700FAF087 /* SFOAuthCredentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 10213A4C16F21F8700FAF087 /* SFOAuthCredentials.h */; };
+		10213A5116F21F8700FAF087 /* SFOAuthInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 10213A4D16F21F8700FAF087 /* SFOAuthInfo.h */; };
 		107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */; };
 		1090C539161275BF0054B040 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1090C538161275BF0054B040 /* Foundation.framework */; };
-		10949F65163846F300997724 /* SFOAuthCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 10949F60163846F300997724 /* SFOAuthCoordinator.h */; };
-		10949F66163846F300997724 /* SFOAuthCredentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 10949F61163846F300997724 /* SFOAuthCredentials.h */; };
-		10949F67163846F300997724 /* SFOAuthInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 10949F62163846F300997724 /* SFOAuthInfo.h */; };
 		10B761821612775400B3CD58 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761811612775400B3CD58 /* Security.framework */; };
 		10B761841612775C00B3CD58 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761831612775C00B3CD58 /* MobileCoreServices.framework */; };
 		10B761861612776000B3CD58 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761851612776000B3CD58 /* SystemConfiguration.framework */; };
@@ -58,13 +58,13 @@
 		100F54731614EAAA00FD5EB8 /* MKNetworkOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKNetworkOperation.h; sourceTree = "<group>"; };
 		100F54741614EAAA00FD5EB8 /* MKNetworkOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKNetworkOperation.m; sourceTree = "<group>"; };
 		100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFNetworkOperation+Internal.h"; sourceTree = "<group>"; };
+		10213A4B16F21F8700FAF087 /* SFOAuthCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCoordinator.h; sourceTree = "<group>"; };
+		10213A4C16F21F8700FAF087 /* SFOAuthCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCredentials.h; sourceTree = "<group>"; };
+		10213A4D16F21F8700FAF087 /* SFOAuthInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthInfo.h; sourceTree = "<group>"; };
+		10213A4E16F21F8700FAF087 /* libSalesforceOAuth.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSalesforceOAuth.a; sourceTree = "<group>"; };
 		107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFNetworkEngine+Internal.h"; sourceTree = "<group>"; };
 		1090C535161275BF0054B040 /* libSalesforceNetworkSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSalesforceNetworkSDK.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1090C538161275BF0054B040 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		10949F60163846F300997724 /* SFOAuthCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCoordinator.h; sourceTree = "<group>"; };
-		10949F61163846F300997724 /* SFOAuthCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCredentials.h; sourceTree = "<group>"; };
-		10949F62163846F300997724 /* SFOAuthInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthInfo.h; sourceTree = "<group>"; };
-		10949F64163846F300997724 /* libSalesforceOAuth.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSalesforceOAuth.a; sourceTree = "<group>"; };
 		10B76165161276F700B3CD58 /* SFNetworkEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkEngine.h; sourceTree = "<group>"; };
 		10B76166161276F700B3CD58 /* SFNetworkEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFNetworkEngine.m; sourceTree = "<group>"; };
 		10B76167161276F700B3CD58 /* SFNetworkOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkOperation.h; sourceTree = "<group>"; };
@@ -122,6 +122,25 @@
 				100F546F1614EAAA00FD5EB8 /* UIAlertView+MKNetworkKitAdditions.m */,
 			);
 			path = Categories;
+			sourceTree = "<group>";
+		};
+		10213A4916F21F8700FAF087 /* SalesforceOAuth */ = {
+			isa = PBXGroup;
+			children = (
+				10213A4A16F21F8700FAF087 /* Headers */,
+				10213A4E16F21F8700FAF087 /* libSalesforceOAuth.a */,
+			);
+			path = SalesforceOAuth;
+			sourceTree = "<group>";
+		};
+		10213A4A16F21F8700FAF087 /* Headers */ = {
+			isa = PBXGroup;
+			children = (
+				10213A4B16F21F8700FAF087 /* SFOAuthCoordinator.h */,
+				10213A4C16F21F8700FAF087 /* SFOAuthCredentials.h */,
+				10213A4D16F21F8700FAF087 /* SFOAuthInfo.h */,
+			);
+			path = Headers;
 			sourceTree = "<group>";
 		};
 		1090C52A161275BF0054B040 = {
@@ -182,44 +201,9 @@
 		10949F5C163846F300997724 /* dependencies */ = {
 			isa = PBXGroup;
 			children = (
-				10949F5D163846F300997724 /* SalesforceOAuth */,
+				10213A4916F21F8700FAF087 /* SalesforceOAuth */,
 			);
 			path = dependencies;
-			sourceTree = "<group>";
-		};
-		10949F5D163846F300997724 /* SalesforceOAuth */ = {
-			isa = PBXGroup;
-			children = (
-				10949F5E163846F300997724 /* Headers */,
-				10949F63163846F300997724 /* Libraries */,
-			);
-			path = SalesforceOAuth;
-			sourceTree = "<group>";
-		};
-		10949F5E163846F300997724 /* Headers */ = {
-			isa = PBXGroup;
-			children = (
-				10949F5F163846F300997724 /* SalesforceOAuth */,
-			);
-			path = Headers;
-			sourceTree = "<group>";
-		};
-		10949F5F163846F300997724 /* SalesforceOAuth */ = {
-			isa = PBXGroup;
-			children = (
-				10949F60163846F300997724 /* SFOAuthCoordinator.h */,
-				10949F61163846F300997724 /* SFOAuthCredentials.h */,
-				10949F62163846F300997724 /* SFOAuthInfo.h */,
-			);
-			path = SalesforceOAuth;
-			sourceTree = "<group>";
-		};
-		10949F63163846F300997724 /* Libraries */ = {
-			isa = PBXGroup;
-			children = (
-				10949F64163846F300997724 /* libSalesforceOAuth.a */,
-			);
-			path = Libraries;
 			sourceTree = "<group>";
 		};
 		10C7513E16151E98008139FD /* Reachability */ = {
@@ -252,9 +236,9 @@
 				100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */,
 				10C7514116151E98008139FD /* Reachability.h in Headers */,
 				107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */,
-				10949F65163846F300997724 /* SFOAuthCoordinator.h in Headers */,
-				10949F66163846F300997724 /* SFOAuthCredentials.h in Headers */,
-				10949F67163846F300997724 /* SFOAuthInfo.h in Headers */,
+				10213A4F16F21F8700FAF087 /* SFOAuthCoordinator.h in Headers */,
+				10213A5016F21F8700FAF087 /* SFOAuthCredentials.h in Headers */,
+				10213A5116F21F8700FAF087 /* SFOAuthInfo.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -317,7 +301,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Generate the headers\nbuild/build.sh -v public_headers";
+			shellScript = "# Generate the headers\nbuild/build.sh gen_headers";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -364,9 +348,14 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/dependencies/SalesforceCommonUtils-Debug/Headers/**";
+				HEADER_SEARCH_PATHS = (
+					"$(BUILT_PRODUCTS_DIR)/Headers",
+					"$(SRCROOT)/dependencies/**",
+				);
+				INSTALL_PATH = /;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/dependencies/SalesforceCommonUtils-Debug/Libraries/**";
+				PRIVATE_HEADERS_FOLDER_PATH = "Headers/$(TARGET_NAME)Private";
+				PUBLIC_HEADERS_FOLDER_PATH = "Headers/$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -385,9 +374,11 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = "$(SRCROOT)/dependencies/SalesforceCommonUtils-Release/Headers/**";
+				HEADER_SEARCH_PATHS = "$(BUILT_PRODUCTS_DIR)/Headers";
+				INSTALL_PATH = /;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/dependencies/SalesforceCommonUtils-Release/Libraries/**";
+				PRIVATE_HEADERS_FOLDER_PATH = "Headers/$(TARGET_NAME)Private";
+				PUBLIC_HEADERS_FOLDER_PATH = "Headers/$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -399,14 +390,14 @@
 				DSTROOT = /tmp/SalesforceNetworkSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch";
-				INSTALL_PATH = /Libraries;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth/Libraries\"",
+					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth\"",
+					"\"$(SRCROOT)/dependencies/\"/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = ../Headers/SalesforceNetworkSDK;
 				SKIP_INSTALL = NO;
 			};
 			name = Debug;
@@ -417,14 +408,14 @@
 				DSTROOT = /tmp/SalesforceNetworkSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch";
-				INSTALL_PATH = /Libraries;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth/Libraries\"",
+					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth\"",
+					"\"$(SRCROOT)/dependencies/\"/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PUBLIC_HEADERS_FOLDER_PATH = ../Headers/SalesforceNetworkSDK;
 				SKIP_INSTALL = NO;
 			};
 			name = Release;

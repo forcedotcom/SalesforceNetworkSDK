@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "SFOAuthCoordinator.h"
+@class SFOAuthCoordinator;
 #import "SFNetworkOperation.h"
 
 // Salesforce's wrapper around common Reachability NetworkStatus Compatible Names.
