@@ -30,6 +30,8 @@ OPT_HELP=
 OPT_BUILDNUM=$BUILD_NUMBER; [[ -z $BUILD_NUMBER ]] && OPT_BUILDNUM=1
 OPT_WORKSPACE=$WORKSPACE; [[ -z $OPT_WORKSPACE ]] && OPT_WORKSPACE=$(cd `dirname $0`/..; echo $PWD)
 OPT_ARTIFACTS=$OPT_WORKSPACE/artifacts
+OPT_JOBURL=$JOB_URL
+
 while getopts "vhw:a:n:b:j:" opt; do
     case $opt in
         h) OPT_HELP=1 ;;
