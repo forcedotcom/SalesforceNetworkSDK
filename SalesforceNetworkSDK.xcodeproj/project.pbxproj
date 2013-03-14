@@ -29,9 +29,9 @@
 		100F54851614EAAA00FD5EB8 /* MKNetworkOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54731614EAAA00FD5EB8 /* MKNetworkOperation.h */; };
 		100F54861614EAAA00FD5EB8 /* MKNetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54741614EAAA00FD5EB8 /* MKNetworkOperation.m */; };
 		100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */; };
-		10213A4F16F21F8700FAF087 /* SFOAuthCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 10213A4B16F21F8700FAF087 /* SFOAuthCoordinator.h */; };
-		10213A5016F21F8700FAF087 /* SFOAuthCredentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 10213A4C16F21F8700FAF087 /* SFOAuthCredentials.h */; };
-		10213A5116F21F8700FAF087 /* SFOAuthInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 10213A4D16F21F8700FAF087 /* SFOAuthInfo.h */; };
+		101160A316F2386600B21B17 /* SFOAuthCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 1011609E16F2386500B21B17 /* SFOAuthCoordinator.h */; };
+		101160A416F2386600B21B17 /* SFOAuthCredentials.h in Headers */ = {isa = PBXBuildFile; fileRef = 1011609F16F2386500B21B17 /* SFOAuthCredentials.h */; };
+		101160A516F2386600B21B17 /* SFOAuthInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 101160A016F2386500B21B17 /* SFOAuthInfo.h */; };
 		107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */; };
 		1090C539161275BF0054B040 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1090C538161275BF0054B040 /* Foundation.framework */; };
 		10B761821612775400B3CD58 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761811612775400B3CD58 /* Security.framework */; };
@@ -58,10 +58,10 @@
 		100F54731614EAAA00FD5EB8 /* MKNetworkOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKNetworkOperation.h; sourceTree = "<group>"; };
 		100F54741614EAAA00FD5EB8 /* MKNetworkOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKNetworkOperation.m; sourceTree = "<group>"; };
 		100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFNetworkOperation+Internal.h"; sourceTree = "<group>"; };
-		10213A4B16F21F8700FAF087 /* SFOAuthCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCoordinator.h; sourceTree = "<group>"; };
-		10213A4C16F21F8700FAF087 /* SFOAuthCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCredentials.h; sourceTree = "<group>"; };
-		10213A4D16F21F8700FAF087 /* SFOAuthInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthInfo.h; sourceTree = "<group>"; };
-		10213A4E16F21F8700FAF087 /* libSalesforceOAuth.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSalesforceOAuth.a; sourceTree = "<group>"; };
+		1011609E16F2386500B21B17 /* SFOAuthCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCoordinator.h; sourceTree = "<group>"; };
+		1011609F16F2386500B21B17 /* SFOAuthCredentials.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthCredentials.h; sourceTree = "<group>"; };
+		101160A016F2386500B21B17 /* SFOAuthInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFOAuthInfo.h; sourceTree = "<group>"; };
+		101160A216F2386600B21B17 /* libSalesforceOAuth.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libSalesforceOAuth.a; sourceTree = "<group>"; };
 		107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFNetworkEngine+Internal.h"; sourceTree = "<group>"; };
 		1090C535161275BF0054B040 /* libSalesforceNetworkSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSalesforceNetworkSDK.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1090C538161275BF0054B040 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -124,23 +124,31 @@
 			path = Categories;
 			sourceTree = "<group>";
 		};
-		10213A4916F21F8700FAF087 /* SalesforceOAuth */ = {
+		1011609C16F2386500B21B17 /* SalesforceOAuth */ = {
 			isa = PBXGroup;
 			children = (
-				10213A4A16F21F8700FAF087 /* Headers */,
-				10213A4E16F21F8700FAF087 /* libSalesforceOAuth.a */,
+				1011609D16F2386500B21B17 /* Headers */,
+				101160A116F2386500B21B17 /* Libraries */,
 			);
 			path = SalesforceOAuth;
 			sourceTree = "<group>";
 		};
-		10213A4A16F21F8700FAF087 /* Headers */ = {
+		1011609D16F2386500B21B17 /* Headers */ = {
 			isa = PBXGroup;
 			children = (
-				10213A4B16F21F8700FAF087 /* SFOAuthCoordinator.h */,
-				10213A4C16F21F8700FAF087 /* SFOAuthCredentials.h */,
-				10213A4D16F21F8700FAF087 /* SFOAuthInfo.h */,
+				1011609E16F2386500B21B17 /* SFOAuthCoordinator.h */,
+				1011609F16F2386500B21B17 /* SFOAuthCredentials.h */,
+				101160A016F2386500B21B17 /* SFOAuthInfo.h */,
 			);
 			path = Headers;
+			sourceTree = "<group>";
+		};
+		101160A116F2386500B21B17 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				101160A216F2386600B21B17 /* libSalesforceOAuth.a */,
+			);
+			path = Libraries;
 			sourceTree = "<group>";
 		};
 		1090C52A161275BF0054B040 = {
@@ -201,7 +209,7 @@
 		10949F5C163846F300997724 /* dependencies */ = {
 			isa = PBXGroup;
 			children = (
-				10213A4916F21F8700FAF087 /* SalesforceOAuth */,
+				1011609C16F2386500B21B17 /* SalesforceOAuth */,
 			);
 			path = dependencies;
 			sourceTree = "<group>";
@@ -236,9 +244,9 @@
 				100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */,
 				10C7514116151E98008139FD /* Reachability.h in Headers */,
 				107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */,
-				10213A4F16F21F8700FAF087 /* SFOAuthCoordinator.h in Headers */,
-				10213A5016F21F8700FAF087 /* SFOAuthCredentials.h in Headers */,
-				10213A5116F21F8700FAF087 /* SFOAuthInfo.h in Headers */,
+				101160A316F2386600B21B17 /* SFOAuthCoordinator.h in Headers */,
+				101160A416F2386600B21B17 /* SFOAuthCredentials.h in Headers */,
+				101160A516F2386600B21B17 /* SFOAuthInfo.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
