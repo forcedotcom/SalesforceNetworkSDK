@@ -154,7 +154,6 @@
 		1090C53A161275BF0054B040 /* SalesforceNetworkSDK */ = {
 			isa = PBXGroup;
 			children = (
-				10949F5C163846F300997724 /* dependencies */,
 				10C7513E16151E98008139FD /* Reachability */,
 				100F54641614EAAA00FD5EB8 /* MKNetworkKit */,
 				10B76165161276F700B3CD58 /* SFNetworkEngine.h */,
@@ -176,13 +175,6 @@
 				10B761731612773900B3CD58 /* SalesforceNetworkSDK-Prefix.pch */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		10949F5C163846F300997724 /* dependencies */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = dependencies;
 			sourceTree = "<group>";
 		};
 		10C7513E16151E98008139FD /* Reachability */ = {
