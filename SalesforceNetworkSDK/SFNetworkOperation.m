@@ -359,6 +359,16 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
 }
 
+- (void)addFile:(NSString *)file forKey:(NSString *)key {
+    if (file == nil) {
+        return;
+    }
+    
+    if (_internalOperation) {
+        [_internalOperation addFile:file forKey:key];
+    }
+}
+
 #pragma mark - Response Methods
 - (NSString *)responseAsString {
     if (_internalOperation) {
