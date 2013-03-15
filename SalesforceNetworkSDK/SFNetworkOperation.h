@@ -167,6 +167,7 @@ Path to store downloaded content. If this value is set, all content downloaded b
  */
 - (void)addPostFileData:(NSData *)fileData paramName:(NSString *)paramName fileName:(NSString *)fileName mimeType:(NSString *)mimeType;
 
+- (void)addFile:(NSString *)file forKey:(NSString *)key;
 ///---------------------------------------------------------------
 /// @name Block Methods
 ///---------------------------------------------------------------
