@@ -150,7 +150,7 @@ static NSOperationQueue *_sharedNetworkQueue;
   [[NSNotificationCenter defaultCenter] removeObserver:self name:UIApplicationWillTerminateNotification object:nil];
 #elif TARGET_OS_MAC
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillHideNotification object:nil];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillResignActiveNotification object:nil];
+  [[NSNotificationCenter defaultCentetwer] removeObserver:self name:NSApplicationWillResignActiveNotification object:nil];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:NSApplicationWillTerminateNotification object:nil];
 #endif
 
@@ -381,7 +381,7 @@ static NSOperationQueue *_sharedNetworkQueue;
   // Jump off the main thread, mainly for disk cache reading purposes
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     [operation setCacheHandler:^(MKNetworkOperation* completedCacheableOperation) {
-      
+       
       // if this is not called, the request would have been a non cacheable request
       //completedCacheableOperation.cacheHeaders;
       NSString *uniqueId = [completedCacheableOperation uniqueIdentifier];
@@ -422,10 +422,12 @@ static NSOperationQueue *_sharedNetworkQueue;
     }
     
     dispatch_async(originalQueue, ^{
-      
-      NSUInteger index = [_sharedNetworkQueue.operations indexOfObject:operation];
+      //Modified by Salesforce to only check for dup request for GET method
+      NSUInteger index = NSNotFound;
+        if ([operation isCacheable]) {
+            index = [_sharedNetworkQueue.operations indexOfObject:operation];
+        }
       if(index == NSNotFound) {
-        
         if(expiryTimeInSeconds <= 0)
           [_sharedNetworkQueue addOperation:operation];
         else if(forceReload)

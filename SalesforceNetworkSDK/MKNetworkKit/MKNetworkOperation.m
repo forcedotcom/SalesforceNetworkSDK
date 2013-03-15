@@ -24,7 +24,6 @@
 //  THE SOFTWARE.
 
 #import "MKNetworkKit.h"
-#import "SalesforceCommonUtils.h"
 
 #ifdef __OBJC_GC__
 #error MKNetworkKit does not support Objective-C Garbage Collection
@@ -1072,22 +1071,23 @@
             [challenge.sender useCredential:credential forAuthenticationChallenge:challenge];
         }
         else if (challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust) {
-#warning method not tested. proceed at your own risk
-            SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
-            SecTrustResultType result;
-            SecTrustEvaluate(serverTrust, &result);
             
-            if(result == kSecTrustResultProceed) {
+            if(challenge.previousFailureCount < 5) {
+                SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
+                SecTrustResultType result;
+                SecTrustEvaluate(serverTrust, &result);
                 
-                [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
-            }
-            else if(result == kSecTrustResultConfirm) {
+                if(result == kSecTrustResultProceed ||
+                   result == kSecTrustResultUnspecified || //The cert is valid, but user has not explicitly accepted/denied. Ok to proceed (Ch 15: iOS PTL :Pg 269)
+                   result == kSecTrustResultRecoverableTrustFailure //The cert is invalid, but is invalid because of name mismatch. Ok to proceed (Ch 15: iOS PTL :Pg 269)
+                   ) {
+                    [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+                } else if(result == kSecTrustResultConfirm) {
                 
-                DLog(@"Certificate is not trusted, continuing without credentials. Might result in 401 Unauthorized");
-                [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
-            }
-            else {
-                
+                    DLog(@"Certificate is not trusted, continuing without credentials. Might result in 401 Unauthorized");
+                    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+                }
+            } else {
                 DLog(@"Certificate is invalid, continuing without credentials. Might result in 401 Unauthorized");
                 [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
             }

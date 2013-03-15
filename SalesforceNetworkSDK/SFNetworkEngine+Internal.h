@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "SFNetworkOperation.h"
 #import "SFNetworkEngine.h"
-#import "SFOAuthCoordinator.h"
+
 @interface SFNetworkEngine () <SFOAuthCoordinatorDelegate>
 
 @property (nonatomic, strong) MKNetworkEngine *internalNetworkEngine;
@@ -84,10 +84,6 @@
 /** Queue `SFNetworkOperation` due to expired access token 
  */
 - (void)queueOperationOnExpiredAccessToken:(SFNetworkOperation *)operation;
-
-/** Replay all operations stored in `operationsWaitingForAccessToken` queue
- */
-- (void)replayOperationsWaitingForAccessToken;
 
 /** Fatal OAuth error happened. Call error block of all operations stored in `operationsWaitingForAccessToken` queue
  */

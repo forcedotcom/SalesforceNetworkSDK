@@ -56,8 +56,10 @@
 
 /** Check for errorCode returned in JSON response from server
  @param  responseStr Server response str
+ @param  error Server response str
+ 
  */
-- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr;
+- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr withError:(NSError * )error;
 
 
 /** Return YES if should automatically retry the operation on network error

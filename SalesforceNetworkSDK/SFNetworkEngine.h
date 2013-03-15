@@ -7,8 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-
-#import "SFOAuthCoordinator.h"
+#import <SalesforceOAuth/SFOAuthCoordinator.h>
 #import "SFNetworkOperation.h"
 
 // Salesforce's wrapper around common Reachability NetworkStatus Compatible Names.
@@ -234,4 +233,8 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  @param operationTag Operation tag
  */
 - (BOOL)hasPendingOperationsWithTag:(NSString *)operationTag;
+
+/** Replay all operations stored in `operationsWaitingForAccessToken` queue
+ */
+- (void)replayOperationsWaitingForAccessToken;
 @end

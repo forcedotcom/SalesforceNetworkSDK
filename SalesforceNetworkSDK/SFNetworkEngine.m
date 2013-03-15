@@ -9,7 +9,6 @@
 #import "Reachability.h"
 #import "SFNetworkEngine.h"
 #import "MKNetworkKit.h"
-#import "SalesforceCommonUtils.h"
 #import "SFNetworkOperation.h"
 #import "SFNetworkOperation+Internal.h"
 #import "SFNetworkEngine+Internal.h"
@@ -89,6 +88,8 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         _enableHttpPipeling = YES;
         _supportLocalTestData = NO;
         _operationsWaitingForAccessToken = [[NSMutableArray alloc] init];
+        
+        _operationsWaitingForNetwork = [[NSMutableArray alloc] init];
         
         //Monitor application enters and exist background
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -229,6 +230,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     SFNetworkOperation *operation = [[SFNetworkOperation alloc] initWithOperation:internalOperation url:url method:method ssl:useSSL];
     operation.operationTimeout = self.operationTimeout;
     operation.customHeaders = self.customHeaders;
+   
     return operation;
 }
 
@@ -604,13 +606,25 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 }
 
 - (void)replayOperationsWaitingForNetwork {
-    NSArray *safeCopy = nil;
+    NSMutableArray *safeCopy = nil;
     @synchronized(self) {
         if (self.operationsWaitingForNetwork.count == 0) {
             return;
         }
-        safeCopy = [self.operationsWaitingForNetwork copy];
+        
+        safeCopy = [NSMutableArray  arrayWithArray:[self.operationsWaitingForNetwork copy]];
+        
         [self.operationsWaitingForNetwork removeAllObjects];
+        
+        // Check for access token and if there is not any then move the operation to the waiting for token queue.
+        NSString* accessToken = self.coordinator.credentials.accessToken;
+        for(SFNetworkOperation * operation in safeCopy) {
+            if(!accessToken && operation.requiresAccessToken) {
+                [self.operationsWaitingForAccessToken addObject:operation];
+            }
+        }
+            
+        [safeCopy removeObjectsInArray:self.operationsWaitingForAccessToken];
     }
     
     for (SFNetworkOperation *operation in safeCopy) {

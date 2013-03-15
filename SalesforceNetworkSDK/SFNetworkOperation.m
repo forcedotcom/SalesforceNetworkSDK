@@ -9,12 +9,10 @@
 #import "SFNetworkOperation.h"
 #import "MKNetworkKit.h"
 #import "SFNetworkOperation+Internal.h"
-#import "SalesforceCommonUtils.h"
 #import "SFNetworkEngine+Internal.h"
 #import "SFNetworkUtils.h"
 
 static NSString *kDefaultFileDataMimeType = @"multipart/form-data";
-static NSString *kErrorCodeKeyInResponse = @"errorCode";
 static NSString *kSFNetworkOperationErrorDomain = @"com.salesforce.SFNetworkSDK.ErrorDomain";
 static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 
@@ -45,6 +43,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     self = [super init];
     if (self) {
         _internalOperation = operation;
+        
         _cancelBlocks = [[NSMutableArray alloc] init];
         _useSSL = useSSL;
         _method = method;
@@ -212,7 +211,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         if ([operation isCacheable] && !operation.isFinished) {
             //only cancel cacheable operation, which means GET only
             [operation cancel];
-            
+                
             //cancel download file if applicable
             [[self class] deleteUnfinishedDownloadFileForOperation:operation];
         }
@@ -278,7 +277,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                 };
             });
         } onError:^(NSError *error) {
-            NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString];
+            NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
             if (serviceError) {
                 error = serviceError;
             }
@@ -298,6 +297,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                 if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
                     //Permission denied error
                     NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
+                    
                     if (potentialError) {
                         error = potentialError;
                     }
@@ -415,10 +415,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return;
     }
     
-    NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString];
+    NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
     if (serviceError) {
         error = serviceError;
     }
+    
     [self log:SFLogLevelError format:@"callDelegateDidFailWithError %@", error];
     __weak SFNetworkOperation *weakSelf = self;
     [[self class] deleteUnfinishedDownloadFileForOperation:weakSelf.internalOperation];
@@ -443,7 +444,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             //Permission denied error
             //Server side sometimes return 403 with JSON object to
             //indicate permission denied error
-            NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString];
+            NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString withError:error];
             if (potentialError) {
                 error = potentialError;
             }
@@ -479,14 +480,15 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
     NSString *responseStr = [operation responseString];
     
-    return [self checkForErrorInResponseStr:responseStr];
+    return [self checkForErrorInResponseStr:responseStr withError:operation.error];
 }
 
-- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr {
-    if (nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
+- (NSError *)checkForErrorInResponseStr:(NSString *)responseStr withError:(NSError * )error {
+    if (error || nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
         //Not JSON format
-        return nil;
+        return error;
     }
+    
     
     id jsonResponse = [self responseAsJSON];
     if (jsonResponse && [jsonResponse isKindOfClass:[NSArray class]]) {
@@ -495,8 +497,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             if ([potentialError isKindOfClass:[NSDictionary class]]) {
                 NSString *potentialErrorCode = [potentialError objectForKey:kErrorCodeKeyInResponse];
                 if (nil != potentialErrorCode) {
-                    // we have an error
-                    NSError *error = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:kFailedWithServerReturnedErrorCode userInfo:potentialError];
+                        NSError *error = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:kFailedWithServerReturnedErrorCode userInfo:potentialError];
                     return error;
                 }
             }
