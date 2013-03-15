@@ -277,7 +277,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Generate the headers\nbuild/build.sh -v public_headers";
+			shellScript = "# Generate the headers\nbuild/build.sh -v gen_headers";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -328,6 +328,7 @@
 					"$(BUILT_PRODUCTS_DIR)/Headers",
 					"$(SRCROOT)/dependencies/**",
 				);
+				INSTALL_PATH = /;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/dependencies/**";
 				OTHER_LDFLAGS = (
@@ -358,6 +359,7 @@
 					"$(BUILT_PRODUCTS_DIR)/Headers",
 					"$(SRCROOT)/dependencies/**",
 				);
+				INSTALL_PATH = /;
 				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/dependencies/**";
 				OTHER_LDFLAGS = (
@@ -377,7 +379,12 @@
 				DSTROOT = /tmp/SalesforceNetworkSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch";
-				INSTALL_PATH = /Libraries;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth/Libraries\"",
+					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth\"",
+					"$(SRCROOT)/dependencies/**",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = NO;
 			};
@@ -389,7 +396,12 @@
 				DSTROOT = /tmp/SalesforceNetworkSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch";
-				INSTALL_PATH = /Libraries;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth/Libraries\"",
+					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth\"",
+					"$(SRCROOT)/dependencies/**",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = NO;
 			};
