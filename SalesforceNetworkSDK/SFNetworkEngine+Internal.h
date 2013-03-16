@@ -10,7 +10,7 @@
 #import "SFNetworkOperation.h"
 #import "SFNetworkEngine.h"
 
-@interface SFNetworkEngine () <SFOAuthCoordinatorDelegate>
+@interface SFNetworkEngine ()
 
 @property (nonatomic, strong) MKNetworkEngine *internalNetworkEngine;
 
@@ -36,12 +36,6 @@
  */
 @property (nonatomic, assign) BOOL networkChangeShouldTriggerTokenRefresh;
 
-/** Store previous delegate of `coordinator`.
- 
- `SFNetworkEngine` will set itself as `coordinator` delegate during `refreshAccessToken`. This property is used to remember and restore `coordinator` after refresh token is finished
- */
-@property (nonatomic, assign) id<SFOAuthCoordinatorDelegate> previousOAuthDelegate;
-
 
 /** Read and return data from local test file
  
@@ -57,26 +51,6 @@
 /** Start refresh access token flow
 */
 - (void)startRefreshAccessTokenFlow;
-
-/** Access token refresh flow stop
- 
- @param willAutoRetryRefreshFlow YES if `SFNetworkEngine` will auto-retry access token refresh flow
- */
-- (void)refreshAccessTokenFlowStopped:(BOOL)willAutoRetryRefreshFlow;
-
-/**Method to be invoked when access token is refreshed
- 
- Upon calling of this method, `SFNetworkEngine` will retrieve the updated access token from the `coordinator` property and replay all requests that are queued up due to access token expiration
- 
- @param coordinator `​SFOAuth​Coordinator` return by OAuth flow when access token is refreshed
- */
-- (void)accessTokenRefreshed:(SFOAuthCoordinator *)coordinator;
-
-/** Restore the original OAuth delegate after access token fresh flow stopped
- 
- See `previousOAuthDelegate` for more details
- */
-- (void)restoreOAuthDelegate;
 
 ///---------------------------------------------------------------
 /// @name Queue & Replay Operation Methods

@@ -31,6 +31,8 @@
 		100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F548D1614F9D000FD5EB8 /* SFNetworkOperation+Internal.h */; };
 		107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */; };
 		1090C539161275BF0054B040 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1090C538161275BF0054B040 /* Foundation.framework */; };
+		10999EE716F3D54A00263461 /* SFNetworkCoordinator.h in Headers */ = {isa = PBXBuildFile; fileRef = 10999EE516F3D54A00263461 /* SFNetworkCoordinator.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		10999EE816F3D54A00263461 /* SFNetworkCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 10999EE616F3D54A00263461 /* SFNetworkCoordinator.m */; };
 		10B761821612775400B3CD58 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761811612775400B3CD58 /* Security.framework */; };
 		10B761841612775C00B3CD58 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761831612775C00B3CD58 /* MobileCoreServices.framework */; };
 		10B761861612776000B3CD58 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B761851612776000B3CD58 /* SystemConfiguration.framework */; };
@@ -58,6 +60,8 @@
 		107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFNetworkEngine+Internal.h"; sourceTree = "<group>"; };
 		1090C535161275BF0054B040 /* libSalesforceNetworkSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSalesforceNetworkSDK.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1090C538161275BF0054B040 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		10999EE516F3D54A00263461 /* SFNetworkCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkCoordinator.h; sourceTree = "<group>"; };
+		10999EE616F3D54A00263461 /* SFNetworkCoordinator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFNetworkCoordinator.m; sourceTree = "<group>"; };
 		10B76165161276F700B3CD58 /* SFNetworkEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkEngine.h; sourceTree = "<group>"; };
 		10B76166161276F700B3CD58 /* SFNetworkEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SFNetworkEngine.m; sourceTree = "<group>"; };
 		10B76167161276F700B3CD58 /* SFNetworkOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFNetworkOperation.h; sourceTree = "<group>"; };
@@ -72,7 +76,6 @@
 		10C7514016151E98008139FD /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		CB893A1216A4CCDE00B1A2F2 /* libicucore.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libicucore.dylib; path = usr/lib/libicucore.dylib; sourceTree = SDKROOT; };
 		CB893A1516A4CCF200B1A2F2 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		CB893A1716A4CCF900B1A2F2 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,8 +126,6 @@
 		1090C52A161275BF0054B040 = {
 			isa = PBXGroup;
 			children = (
-				CB893A1716A4CCF900B1A2F2 /* CoreData.framework */,
-				CB893A1516A4CCF200B1A2F2 /* CFNetwork.framework */,
 				CB893A1216A4CCDE00B1A2F2 /* libicucore.dylib */,
 				1090C53A161275BF0054B040 /* SalesforceNetworkSDK */,
 				1090C537161275BF0054B040 /* Frameworks */,
@@ -143,6 +144,7 @@
 		1090C537161275BF0054B040 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CB893A1516A4CCF200B1A2F2 /* CFNetwork.framework */,
 				10B761851612776000B3CD58 /* SystemConfiguration.framework */,
 				10B761831612775C00B3CD58 /* MobileCoreServices.framework */,
 				10B761811612775400B3CD58 /* Security.framework */,
@@ -156,6 +158,8 @@
 			children = (
 				10C7513E16151E98008139FD /* Reachability */,
 				100F54641614EAAA00FD5EB8 /* MKNetworkKit */,
+				10999EE516F3D54A00263461 /* SFNetworkCoordinator.h */,
+				10999EE616F3D54A00263461 /* SFNetworkCoordinator.m */,
 				10B76165161276F700B3CD58 /* SFNetworkEngine.h */,
 				107CC73D1615F48800B0C504 /* SFNetworkEngine+Internal.h */,
 				10B76166161276F700B3CD58 /* SFNetworkEngine.m */,
@@ -207,6 +211,7 @@
 				100F548E1614F9D100FD5EB8 /* SFNetworkOperation+Internal.h in Headers */,
 				10C7514116151E98008139FD /* Reachability.h in Headers */,
 				107CC73E1615F48800B0C504 /* SFNetworkEngine+Internal.h in Headers */,
+				10999EE716F3D54A00263461 /* SFNetworkCoordinator.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,6 +294,7 @@
 				100F54831614EAAA00FD5EB8 /* MKNetworkEngine.m in Sources */,
 				100F54861614EAAA00FD5EB8 /* MKNetworkOperation.m in Sources */,
 				10C7514216151E98008139FD /* Reachability.m in Sources */,
+				10999EE816F3D54A00263461 /* SFNetworkCoordinator.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

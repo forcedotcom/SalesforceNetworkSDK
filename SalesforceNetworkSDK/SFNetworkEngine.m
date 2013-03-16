@@ -45,7 +45,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
  
  @param coordinator New SFOAuthCoordinator object
 */
-- (BOOL)needToRecreateNetworkEngine:(SFOAuthCoordinator *)coordinator;
+- (BOOL)needToRecreateNetworkEngine:(SFNetworkCoordinator *)coordinator;
 
 /** Return default custom HTTP headers
  
@@ -72,7 +72,6 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 @synthesize internalNetworkEngine = _internalNetworkEngine;
 @synthesize operationsWaitingForAccessToken = _operationsWaitingForAccessToken;
 @synthesize accessTokenBeingRefreshed = _accessTokenBeingRefreshed;
-@synthesize previousOAuthDelegate = _previousOAuthDelegate;
 @synthesize networkChangeShouldTriggerTokenRefresh = _networkChangeShouldTriggerTokenRefresh;
 @synthesize enableHttpPipeling = _enableHttpPipeling;
 @synthesize supportLocalTestData = _supportLocalTestData;
@@ -122,14 +121,13 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     @synchronized(self) {
         _accessTokenBeingRefreshed = NO;
         _networkChangeShouldTriggerTokenRefresh = NO;
-        [self restoreOAuthDelegate];
         [self.operationsWaitingForAccessToken removeAllObjects];
         [self.internalNetworkEngine cancellAllOperations];
     }
 }
 
 #pragma mark - Property Override
-- (void)setCoordinator:(SFOAuthCoordinator *)coordinator {
+- (void)setCoordinator:(SFNetworkCoordinator *)coordinator {
     if (_internalNetworkEngine) {
         //network engine created before
         if ([self needToRecreateNetworkEngine:coordinator]) {
@@ -138,10 +136,24 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         }
     }
     _coordinator = coordinator;
-    self.remoteHost = [_coordinator.credentials.instanceUrl host];
+    self.remoteHost = [_coordinator host];
     if (!_internalNetworkEngine) {
         //If network engine is not created, create it
         [self internalNetworkEngine];
+    }
+    
+    @synchronized(self) {
+        if (self.isAccessTokenBeingRefreshed) {
+            _accessTokenBeingRefreshed = NO;
+            
+            //set OAuth token
+            NSString *token = [NSString stringWithFormat:kAuthoriationHeader, _coordinator.accessToken];
+            [self setHeaderValue:token forKey:kAuthoriationHeaderKey];
+        }
+        if (self.operationsWaitingForAccessToken.count > 0) {
+            [self log:SFLogLevelDebug format:@"Start to replay operationsWaitingForAccessToken"];
+            [self replayOperationsWaitingForAccessToken];
+        }
     }
 }
 
@@ -305,7 +317,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     
     //Make sure authorization header is up-to-date
     if (operation.requiresAccessToken && self.coordinator) {
-        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, self.coordinator.credentials.accessToken];
+        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, self.coordinator.accessToken];
         [operation setHeaderValue:token forKey:kAuthoriationHeaderKey];
     }
     
@@ -370,44 +382,19 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     return NO;
 }
 
-//Access Token Method
-- (void)accessTokenRefreshed:(SFOAuthCoordinator *)coordinator {
-    if (nil == coordinator) {
-        return;
-    }
-    
-    @synchronized(self) {
-        if (!_accessTokenBeingRefreshed) {
-            //If access token is already refreshed
-            return;
-        }
-        
-        _accessTokenBeingRefreshed = NO;
-        self.coordinator = coordinator;
-        
-        //set OAuth token
-        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, _coordinator.credentials.accessToken];
-        [self setHeaderValue:token forKey:kAuthoriationHeaderKey];
-    }
-    
-    [self replayOperationsWaitingForAccessToken];
-}
-
 #pragma mark - Private Method
 /** Return YES when coordinator has changed 
  
  If coordinator instance URL, user Id or orgId is changed, return YES to indicator that internal network engine needs to be re-created
  */
-- (BOOL)needToRecreateNetworkEngine:(SFOAuthCoordinator *)coordinator {
+- (BOOL)needToRecreateNetworkEngine:(SFNetworkCoordinator *)coordinator {
     NSString *newHostName = nil, *newOrgId = nil, *newUserId = nil;
     NSString *currentHostName = nil, *currentOrgId = nil, *currentUserId = nil;
-    SFOAuthCredentials *credentials = nil;
-    
+     
     if (coordinator) {
-        credentials = coordinator.credentials;
-        newHostName = [credentials.instanceUrl host];
-        newOrgId = credentials.organizationId;
-        newUserId = credentials.userId;
+        newHostName = coordinator.host;
+        newOrgId = coordinator.organizationId;
+        newUserId = coordinator.userId;
     }
     else {
         newHostName = @"";
@@ -416,10 +403,9 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     }
     
     if (self.coordinator) {
-        credentials = self.coordinator.credentials;
-        currentHostName = [credentials.instanceUrl host];
-        currentOrgId = credentials.organizationId;
-        currentUserId = credentials.userId;
+        currentHostName = self.coordinator.host;
+        currentOrgId = self.coordinator.organizationId;
+        currentUserId = self.coordinator.userId;
     }
     else {
         currentHostName = @"";
@@ -445,7 +431,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     NSMutableDictionary *headers = [NSMutableDictionary dictionary];
     if (_coordinator) {
         //set OAuth token
-        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, _coordinator.credentials.accessToken];
+        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, _coordinator.accessToken];
         [headers setValue:token forKey:kAuthoriationHeaderKey];
     }
     
@@ -506,36 +492,10 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     @synchronized(self) {
         if (!self.isAccessTokenBeingRefreshed) {
             _accessTokenBeingRefreshed = YES;
-            _networkChangeShouldTriggerTokenRefresh = NO;
-            self.previousOAuthDelegate = self.coordinator.delegate;
-            self.coordinator.delegate = self;
-            
-            //start authentication progress to refresh token
-            if (self.coordinator.isAuthenticating) {
-                [self.coordinator stopAuthentication];
-            }
-            [self.coordinator authenticate];
-        }
-    }
-}
-
-- (void)refreshAccessTokenFlowStopped:(BOOL)willAutoRetryRefreshFlow {
-    @synchronized(self) {
-        _accessTokenBeingRefreshed = NO;
-        _networkChangeShouldTriggerTokenRefresh = NO;
-        if (!willAutoRetryRefreshFlow) {
-            [self restoreOAuthDelegate];
-            if (self.coordinator.isAuthenticating) {
-               [self.coordinator stopAuthentication];
+            if (self.delegate) {
+                [self.delegate refreshSessionForNetworkEngine:self];
             }
         }
-    }
-}
-
-- (void)restoreOAuthDelegate {
-    if (nil != self.previousOAuthDelegate && nil != self.coordinator) {
-        self.coordinator.delegate = self.previousOAuthDelegate;
-        self.previousOAuthDelegate = nil;
     }
 }
 
@@ -617,77 +577,26 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         [self.operationsWaitingForNetwork removeAllObjects];
         
         // Check for access token and if there is not any then move the operation to the waiting for token queue.
-        NSString* accessToken = self.coordinator.credentials.accessToken;
+        BOOL needsAccessToken = NO;
+        NSString* accessToken = self.coordinator.accessToken;
         for(SFNetworkOperation * operation in safeCopy) {
             if(!accessToken && operation.requiresAccessToken) {
+                needsAccessToken = YES;
                 [self.operationsWaitingForAccessToken addObject:operation];
             }
         }
             
         [safeCopy removeObjectsInArray:self.operationsWaitingForAccessToken];
+        
+        if (needsAccessToken) {
+            [self startRefreshAccessTokenFlow];
+        }
     }
     
     for (SFNetworkOperation *operation in safeCopy) {
         [self enqueueOperation:operation];
     }
-}
 
-#pragma mark - SFOAuthCoordinatorDelegate
-- (void)oauthCoordinator:(SFOAuthCoordinator *)coordinator didBeginAuthenticationWithView:(UIWebView *)view {
-    NSLog(@"oauthCoordinator:didBeginAuthenticationWithView");
-    // we are in the token exchange flow so this should never happen
-    //TODO we should probably hand back control to the original coordinator delegate at this point,
-    //since we don't expect to be able to handle this condition!
-    [self refreshAccessTokenFlowStopped:NO];
-    
-    NSError *newError = [NSError errorWithDomain:kSFOAuthErrorDomain code:kOAuthErrorCode userInfo:nil];
-    [self failOperationsWaitingForAccessTokenWithError:newError];
-    
-    // we are creating a temp view here since the oauth library verifies that the view
-    // has a subview after calling oauthCoordinator:didBeginAuthenticationWithView:
-    UIView *tempView = [[UIView alloc] initWithFrame:CGRectZero];
-    [tempView addSubview:view];
-}
-
-- (void)oauthCoordinatorDidAuthenticate:(SFOAuthCoordinator *)coordinator {
-    NSLog(@"oauthCoordinatorDidAuthenticate");
-    // the token exchange worked.
-    
-    //re-set to ensure we are sharing the same coordinator (and update credentials)
-    [self accessTokenRefreshed:coordinator];
-    
-    //mark the stop of the refrsh access token flow
-    [self refreshAccessTokenFlowStopped:NO];
-}
-
-- (void)oauthCoordinator:(SFOAuthCoordinator *)coordinator didFailWithError:(NSError *)error   {
-    NSLog(@"oauthCoordinator:didFailWithError: %@", error);
-    if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeOAuthError) {
-        //OAuth error occurs
-        [self restoreOAuthDelegate];
-        [coordinator revokeAuthentication];
-        return;
-    }
-    
-    //Mark refresh access token as stopped with auto-retry flag set to YES
-    [self refreshAccessTokenFlowStopped:YES];
-    
-    //Other error should trigger a retry at pre-defined schedule
-    //TDOO: Should it be triggered by reachability
-    //Check to see if OAuth failed due to connection error
-    @synchronized(self) {
-        self.networkChangeShouldTriggerTokenRefresh = [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeNetworkError;
-    }
-    
-    //Schedule to run startRefreshAccessTokenFlow even if network status change can trigger the
-    //token refresh flow. This is the cover the edge case where network status change is not
-    //accurately monitored
-    //`accessTokenBeingRefreshed` flag will ensure either network status or scheduled task would
-    //trigger token refresh
-    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, kDefaultRetryDelay * NSEC_PER_SEC);
-    dispatch_after(popTime, dispatch_get_main_queue(), ^{
-        [self startRefreshAccessTokenFlow];
-    });
 }
 
 - (BOOL)operationAlreadyInWaitingQueue:(SFNetworkOperation *)operation {

@@ -19,12 +19,6 @@ NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";
  */
 + (BOOL)isNetworkError:(NSError *)error;
 
-/** Return YES if error is related to OAuth error
- 
- OAuth error should trigger a login progress again
- @param error NSError object used to check whether the error is related to OAuth error
- */
-+ (BOOL)isOAuthError:(NSError *)error;
 
 /** Return YES if error is related to session timeout
  
@@ -55,22 +49,6 @@ NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";
     }
 }
 
-+ (BOOL)isOAuthError:(NSError *)error {
-    if (nil == error) {
-        return NO;
-    }
-    switch (error.code) {
-        case kSFOAuthErrorAccessDenied:
-        case kSFOAuthErrorInvalidClientId:
-        case kSFOAuthErrorInvalidGrant:
-        case kSFOAuthErrorInactiveUser:
-        case kSFOAuthErrorInactiveOrg:
-            return YES;
-            break;
-        default:
-            return NO;
-    }
-}
 
 + (BOOL)isSessionTimeOutError:(NSError *)error {
     if (nil == error) {
@@ -98,9 +76,6 @@ NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";
     }
     if ([[self class] isNetworkError:error]){
         return SFNetworkOperationErrorTypeNetworkError;
-    }
-    if ([[self class] isOAuthError:error]) {
-        return SFNetworkOperationErrorTypeOAuthError;
     }
 
     if ([[self class] isSessionTimeOutError:error]) {

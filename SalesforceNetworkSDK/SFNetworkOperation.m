@@ -288,7 +288,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                 return;
             }
             if ([weakSelf shouldRetryOperation:weakSelf onNetworkError:error]) {
-                //do nothing, queueOperationOnExpiredAccessToken is handled in callDelegateDidFailWithError
+                //do nothing, queueOperationOnNetworkError is handled in callDelegateDidFailWithError
                 [weakSelf log:SFLogLevelError format:@"Network time out encountered. Actual error: [%@]. Will be retried in callDelegateDidFailWithError", [error localizedDescription]];
                 return;
             }
@@ -425,9 +425,14 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     [[self class] deleteUnfinishedDownloadFileForOperation:weakSelf.internalOperation];
     
     if (weakSelf.requiresAccessToken && [SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeSessionTimeOut) {
-        [weakSelf log:SFLogLevelError msg:@"Session timeout encountered. Automatically retry starts"];
-        [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:weakSelf];
-        return;
+        if ([SFNetworkEngine sharedInstance].delegate) {
+            // queue failed operation if networkengine has delegate assigned
+            // if delegate is not assigned, treat timeout as regular error
+            [weakSelf log:SFLogLevelError msg:@"Session timeout encountered. Automatically retry starts"];
+            [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:weakSelf];
+            return;
+        }
+        
     }
     
     

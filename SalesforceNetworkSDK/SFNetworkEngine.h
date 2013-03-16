@@ -7,8 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <SalesforceOAuth/SFOAuthCoordinator.h>
 #import "SFNetworkOperation.h"
+#import "SFNetworkCoordinator.h"
 
 // Salesforce's wrapper around common Reachability NetworkStatus Compatible Names.
 typedef enum {
@@ -41,6 +41,24 @@ extern NSString * const SFNetworkOperationEngineSuspendedNotification;
  */
 extern NSString * const SFNetworkOperationEngineResumedNotification;
 
+
+
+@class SFNetworkEngine;
+
+/** Prototol to implement to handle session refresh 
+ 
+*/
+@protocol SFNetworkEngineDelegate <NSObject>
+@required
+
+/** Implement this method to refresh session 
+ 
+ When session is refreshed, `SFNetworkEngineDelegate` should call `setCoordinator` to update access information
+ */
+- (void)refreshSessionForNetworkEngine:(SFNetworkEngine *)networkEngine;
+
+@end
+
 /**
  Main class used to manage and send `SFNetworkOperation`
  
@@ -56,9 +74,11 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 @interface SFNetworkEngine : NSObject
 
-/** `​SFNetwork​Engine` relies on `​SFOAuth​Coordinator` to interact with the OAuth flow and extract the instanceUrl and accessToken
+/** `​SFNetwork​Engine` relies on `SFNetworkCoordinator` to know where to connect and who to connect as and with what access token
+ 
+ `SFNetworkEngineDelegate` should call this method when access token is refreshed
  */
-@property (nonatomic, strong) SFOAuthCoordinator *coordinator;
+@property (nonatomic, strong) SFNetworkCoordinator *coordinator;
 
 /** If plan to use `SFNetworkEngine` against a non-SFDC source, use remote host to initialize the `SFNetworkEngine` instead.
  
@@ -114,6 +134,9 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
 @property (nonatomic, assign, getter = shouldSuspendRequestsWhenAppEntersBackground) BOOL suspendRequestsWhenAppEntersBackground;
 
 
+/** NetworkEngine delegate responsible for refresh session */
+@property (weak) id<SFNetworkEngineDelegate> delegate;
+ 
 /** Returns the singleton instance of `SFNetworkEngine`
  * After a successful oauth login with an SFOAuthCoordinator, you
  * should set the coordinator property of this instance.
@@ -237,4 +260,5 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
 /** Replay all operations stored in `operationsWaitingForAccessToken` queue
  */
 - (void)replayOperationsWaitingForAccessToken;
+
 @end
