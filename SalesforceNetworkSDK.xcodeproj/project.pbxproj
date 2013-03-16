@@ -383,6 +383,7 @@
 					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth\"",
 					"$(SRCROOT)/dependencies/**",
 				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = NO;
 			};
@@ -400,6 +401,7 @@
 					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth\"",
 					"$(SRCROOT)/dependencies/**",
 				);
+				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = NO;
 			};

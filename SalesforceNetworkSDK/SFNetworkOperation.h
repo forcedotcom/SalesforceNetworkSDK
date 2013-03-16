@@ -167,6 +167,7 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
  */
 - (void)addPostFileData:(NSData *)fileData paramName:(NSString *)paramName fileName:(NSString *)fileName mimeType:(NSString *)mimeType;
 
+- (void)addFile:(NSString *)file forKey:(NSString *)key;
 ///---------------------------------------------------------------
 /// @name Block Methods
 ///---------------------------------------------------------------

@@ -812,16 +812,15 @@
     }];
     
     [self.dataToBePosted enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-        
         NSDictionary *thisDataObject = (NSDictionary*) obj;
         NSString *thisFieldString = nil;
         if (nil != [thisDataObject objectForKey:@"filename"]) {
             thisFieldString = [NSString stringWithFormat:
-             @"--%@\r\nContent-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\nContent-Type: %@\r\nContent-Transfer-Encoding: binary\r\n\r\n",
-             boundary,
-             [thisDataObject objectForKey:@"name"],
-             [thisDataObject objectForKey:@"filename"],
-             [thisDataObject objectForKey:@"mimetype"]];
+                               @"--%@\r\nContent-Disposition: form-data; name=\"%@\"; filename=\"%@\"\r\nContent-Type: %@\r\nContent-Transfer-Encoding: binary\r\n\r\n",
+                               boundary,
+                               [thisDataObject objectForKey:@"name"],
+                               [thisDataObject objectForKey:@"filename"],
+                               [thisDataObject objectForKey:@"mimetype"]];
         } else {
             thisFieldString = [NSString stringWithFormat:
                                @"--%@\r\nContent-Disposition: form-data; name=\"%@\"\r\nContent-Type: %@\r\n\r\n",
@@ -829,8 +828,6 @@
                                [thisDataObject objectForKey:@"name"],
                                [thisDataObject objectForKey:@"mimetype"]];
         }
-        
-        
         [body appendData:[thisFieldString dataUsingEncoding:[self stringEncoding]]];
         [body appendData:[thisDataObject objectForKey:@"data"]];
         [body appendData:[@"\r\n" dataUsingEncoding:[self stringEncoding]]];
@@ -850,8 +847,8 @@
         [self.request setValue:[NSString stringWithFormat:@"%d", [body length]] forHTTPHeaderField:@"Content-Length"];
     }
     
-//    NSString *dataInStr = [[NSString alloc] initWithData:body encoding:NSASCIIStringEncoding];
-//    NSLog(@"body data is %@", dataInStr);
+    //    NSString *dataInStr = [[NSString alloc] initWithData:body encoding:NSASCIIStringEncoding];
+    //    NSLog(@"body data is %@", dataInStr);
     return body;
 }
 
@@ -1071,23 +1068,22 @@
             [challenge.sender useCredential:credential forAuthenticationChallenge:challenge];
         }
         else if (challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust) {
+#warning method not tested. proceed at your own risk
+            SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
+            SecTrustResultType result;
+            SecTrustEvaluate(serverTrust, &result);
             
-            if(challenge.previousFailureCount < 5) {
-                SecTrustRef serverTrust = [[challenge protectionSpace] serverTrust];
-                SecTrustResultType result;
-                SecTrustEvaluate(serverTrust, &result);
+            if(result == kSecTrustResultProceed) {
                 
-                if(result == kSecTrustResultProceed ||
-                   result == kSecTrustResultUnspecified || //The cert is valid, but user has not explicitly accepted/denied. Ok to proceed (Ch 15: iOS PTL :Pg 269)
-                   result == kSecTrustResultRecoverableTrustFailure //The cert is invalid, but is invalid because of name mismatch. Ok to proceed (Ch 15: iOS PTL :Pg 269)
-                   ) {
-                    [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
-                } else if(result == kSecTrustResultConfirm) {
+                [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+            }
+            else if(result == kSecTrustResultConfirm) {
                 
-                    DLog(@"Certificate is not trusted, continuing without credentials. Might result in 401 Unauthorized");
-                    [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
-                }
-            } else {
+                DLog(@"Certificate is not trusted, continuing without credentials. Might result in 401 Unauthorized");
+                [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+            }
+            else {
+                
                 DLog(@"Certificate is invalid, continuing without credentials. Might result in 401 Unauthorized");
                 [challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
             }
@@ -1258,8 +1254,6 @@
             }
         }
     }
-    
-    
 }
 
 - (void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten
@@ -1438,7 +1432,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
         UILocalNotification *localNotification = [[UILocalNotification alloc] init];
         
         localNotification.alertBody = [self.error localizedDescription];
-        localNotification.alertAction = NSLocalizedString(@"Dismiss", @"");	
+        localNotification.alertAction = NSLocalizedString(@"Dismiss", @"");
         
         [[UIApplication sharedApplication] presentLocalNotificationNow:localNotification];
     }
@@ -1454,7 +1448,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     }
     DLog(@"%@, [%@]", self, [self.error localizedDescription]);
     for(MKNKErrorBlock errorBlock in self.errorBlocks)
-        errorBlock(error);  
+        errorBlock(error);
     
 #if TARGET_OS_IPHONE
     DLog(@"State: %d", [[UIApplication sharedApplication] applicationState]);
