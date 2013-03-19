@@ -18,6 +18,8 @@
 @property (strong) NSString *host;
 @property (strong) NSString *organizationId;
 @property (strong) NSString *userId;
+@property (strong) NSNumber *portNumber;
+@property (strong) NSNumber *sslPortNumber;
 
 /** Access token */
 @property (strong) NSString *accessToken;
