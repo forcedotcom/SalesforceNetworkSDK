@@ -213,7 +213,6 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 #pragma mark - Remote Request Methods 
 - (SFNetworkOperation *)operationWithUrl:(NSString *)url params:(NSDictionary *)params httpMethod:(NSString *)method ssl:(BOOL)useSSL {
     MKNetworkEngine *engine = [self internalNetworkEngine];
-    
     if ([NSString isEmpty:url]) {
         [self log:SFLogLevelError format:@"Remote request URL is nil for params %@", params];
         return nil;
@@ -223,13 +222,19 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (![lowerCaseUrl hasPrefix:@"http:"] && ![lowerCaseUrl hasPrefix:@"https:"]) {
         //relative URL, construct full URL
         NSString *scheme = useSSL ? @"https" : @"http";
+        NSString *portNumber = @"";
+        if (useSSL) {
+           portNumber =  self.coordinator.sslPortNumber? [NSString stringWithFormat:@":%d", [self.coordinator.sslPortNumber intValue]] : @"";
+        } else {
+           portNumber =  self.coordinator.portNumber? [NSString stringWithFormat:@":%d", [self.coordinator.portNumber intValue]] : @"";
+        }
         
         //If API path is nil or URL already starts with API path, construct with instanceUrl only
         if ([NSString isEmpty:self.apiPath] || [lowerCaseUrl hasPrefix:[self.apiPath lowercaseString]]) {
-            url = [NSString stringWithFormat:@"%@://%@/%@", scheme, self.remoteHost, url];
+            url = [NSString stringWithFormat:@"%@://%@%@/%@", scheme, self.remoteHost, portNumber, url];
         }
         else {
-            url = [NSString stringWithFormat:@"%@://%@/%@/%@",scheme, self.remoteHost, self.apiPath, url];
+            url = [NSString stringWithFormat:@"%@://%@%@/%@/%@",scheme, self.remoteHost, portNumber, self.apiPath, url];
         }
     }
     else {
