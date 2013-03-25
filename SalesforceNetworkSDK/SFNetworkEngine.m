@@ -121,6 +121,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     @synchronized(self) {
         _accessTokenBeingRefreshed = NO;
         _networkChangeShouldTriggerTokenRefresh = NO;
+        _coordinator = nil;
         [self.operationsWaitingForAccessToken removeAllObjects];
         
         // Only if we have a internal Network Engine
@@ -310,10 +311,6 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (nil == operation || nil == operation.internalOperation) {
         return;
     }
-    if (nil == self.coordinator) {
-        //if coordinator is nil, set requiresAccessToken to NO
-        operation.requiresAccessToken = NO;
-    }
     
     @synchronized(self) {
         if (self.isAccessTokenBeingRefreshed) {
@@ -325,9 +322,15 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     }
     
     //Make sure authorization header is up-to-date
-    if (operation.requiresAccessToken && self.coordinator) {
-        NSString *token = [NSString stringWithFormat:kAuthoriationHeader, self.coordinator.accessToken];
-        [operation setHeaderValue:token forKey:kAuthoriationHeaderKey];
+    if (operation.requiresAccessToken) {
+        if (self.coordinator) {
+            NSString *token = [NSString stringWithFormat:kAuthoriationHeader, self.coordinator.accessToken];
+            [operation setHeaderValue:token forKey:kAuthoriationHeaderKey];
+        } else {
+            // directly queue up the operation as access token is missing
+            [self queueOperationOnExpiredAccessToken:operation];
+            return;
+        }
     }
     
     //Handle testing mode and read data from local test file
@@ -415,17 +418,16 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         currentHostName = self.coordinator.host;
         currentOrgId = self.coordinator.organizationId;
         currentUserId = self.coordinator.userId;
+        
+        BOOL needToRecreate = ![newHostName isEqualToString:currentHostName]
+        ||![newOrgId isEqualToString:currentOrgId]
+        ||![newUserId isEqualToString:currentUserId];
+        
+        return needToRecreate;
     }
     else {
-        currentHostName = @"";
-        currentOrgId = @"";
-        currentUserId = @"";
+        return NO;
     }
-    BOOL needToRecreate = ![newHostName isEqualToString:currentHostName]
-    ||![newOrgId isEqualToString:currentOrgId]
-    ||![newUserId isEqualToString:currentUserId];
-    
-    return needToRecreate;
 }
 
 /** Return default custom headers to use for the internal network engine 
