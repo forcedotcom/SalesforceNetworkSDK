@@ -414,17 +414,16 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         currentHostName = self.coordinator.host;
         currentOrgId = self.coordinator.organizationId;
         currentUserId = self.coordinator.userId;
+        
+        BOOL needToRecreate = ![newHostName isEqualToString:currentHostName]
+        ||![newOrgId isEqualToString:currentOrgId]
+        ||![newUserId isEqualToString:currentUserId];
+        
+        return needToRecreate;
     }
     else {
-        currentHostName = @"";
-        currentOrgId = @"";
-        currentUserId = @"";
+        return NO;
     }
-    BOOL needToRecreate = ![newHostName isEqualToString:currentHostName]
-    ||![newOrgId isEqualToString:currentOrgId]
-    ||![newUserId isEqualToString:currentUserId];
-    
-    return needToRecreate;
 }
 
 /** Return default custom headers to use for the internal network engine 
