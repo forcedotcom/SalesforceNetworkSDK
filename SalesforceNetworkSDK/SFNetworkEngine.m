@@ -123,7 +123,11 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         _networkChangeShouldTriggerTokenRefresh = NO;
         _coordinator = nil;
         [self.operationsWaitingForAccessToken removeAllObjects];
-        [self.internalNetworkEngine cancellAllOperations];
+        
+        // Only if we have a internal Network Engine
+        if(_internalNetworkEngine) {
+            [self.internalNetworkEngine cancellAllOperations];
+        }
     }
 }
 
