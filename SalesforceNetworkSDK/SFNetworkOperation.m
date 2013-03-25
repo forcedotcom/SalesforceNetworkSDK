@@ -182,9 +182,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     
     __weak SFNetworkOperation *weakSelf = self;
     if (weakSelf.delegate && [weakSelf respondsToSelector:@selector(networkOperationDidCancel:)]) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            [self.delegate networkOperationDidCancel:weakSelf];
-        });
+        if([self canCallback]) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                [self.delegate networkOperationDidCancel:weakSelf];
+            });
+        }
     }
     
     //call cancel blocks
@@ -194,11 +196,13 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             safeCopy = [self.cancelBlocks copy];
             [self.cancelBlocks removeAllObjects];
         }
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            for (SFNetworkOperationCancelBlock cancelBlock in safeCopy) {
-                cancelBlock(weakSelf);
-            }
-        });
+        if([self canCallback]) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                for (SFNetworkOperationCancelBlock cancelBlock in safeCopy) {
+                    cancelBlock(weakSelf);
+                }
+            });
+        }
     }
     
     //Locate existing operations that are already in the queue
@@ -259,23 +263,30 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
 }
 
+-(BOOL) canCallback {
+    // If we have a coordinator then we can call back.. If not then we are most likely logged out and the block might not be available.
+    return [SFNetworkEngine sharedInstance].coordinator?YES:NO;
+}
+
 #pragma mark - Block Methods
 - (void)addCompletionBlock:(SFNetworkOperationCompletionBlock)completionBlock errorBlock:(SFNetworkOperationErrorBlock)errorBlock{
     if (_internalOperation) {
         __weak SFNetworkOperation *weakSelf = self;
         [_internalOperation onCompletion:^(MKNetworkOperation *completedOperation) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                //Perform all callbacks in background queue
-                NSError *error = [self checkForErrorInResponse:completedOperation];
-                if (nil != error) {
-                    if (errorBlock) {
-                        errorBlock(error);
-                    }
-                } else if (completionBlock) {
-                    weakSelf.internalOperation = completedOperation;
-                    completionBlock(weakSelf);
-                };
-            });
+            if([self canCallback]) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                    //Perform all callbacks in background queue
+                    NSError *error = [self checkForErrorInResponse:completedOperation];
+                    if (nil != error) {
+                        if (errorBlock) {
+                            errorBlock(error);
+                        }
+                    } else if (completionBlock) {
+                        weakSelf.internalOperation = completedOperation;
+                        completionBlock(weakSelf);
+                    };
+                });
+            }
         } onError:^(NSError *error) {
             NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
             if (serviceError) {
@@ -303,9 +314,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                     }
                 }
                 
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                    errorBlock(error);
-                });
+                if([self canCallback]) {
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                        errorBlock(error);
+                    });
+                }
             }
         }];
     }
@@ -322,7 +335,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     if (_internalOperation) {
         [_internalOperation onUploadProgressChanged:^(double progress) {
             //Perform all callbacks in background queue
-            if (uploadProgressBlock) {
+            if (uploadProgressBlock && [self canCallback]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     uploadProgressBlock(progress);
                 });
@@ -335,7 +348,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     if (_internalOperation) {
         [_internalOperation onDownloadProgressChanged:^(double progress) {
             //Perform all callbacks in background queue
-            if (downloadProgressBlock) {
+            if (downloadProgressBlock && [self canCallback]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     downloadProgressBlock(progress);
                 });
@@ -414,7 +427,9 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             }
             else {
                 weakSelf.internalOperation = operation;
-                [weakSelf.delegate networkOperationDidFinish:weakSelf];
+                if([self canCallback]) {
+                    [weakSelf.delegate networkOperationDidFinish:weakSelf];
+                }
             }
         });
     }
@@ -466,22 +481,26 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         }
         if (error.code == kCFURLErrorTimedOut) {
             if ([weakSelf.delegate respondsToSelector:@selector(networkOperationDidTimeout:)]) {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                    if (error.code == kCFURLErrorTimedOut) {
-                        [weakSelf.delegate networkOperationDidTimeout:weakSelf];
-                    }
-                });
+                if([self canCallback]) {
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                        if (error.code == kCFURLErrorTimedOut) {
+                            [weakSelf.delegate networkOperationDidTimeout:weakSelf];
+                        }
+                    });
+                }
                 return;
             }
         }
         
         //If delegate did not implement operationDidTimeout or error is not timedout error
         if ([weakSelf.delegate respondsToSelector:@selector(networkOoperation:didFailWithError:)]) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                if (error.code == kCFURLErrorTimedOut) {
-                    [weakSelf.delegate networkOperation:weakSelf didFailWithError:error];
-                }
-            });
+            if([self canCallback]) {
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+                    if (error.code == kCFURLErrorTimedOut) {
+                        [weakSelf.delegate networkOperation:weakSelf didFailWithError:error];
+                    }
+                });
+            }
             return;
         }
     }
