@@ -524,6 +524,13 @@ typedef enum {
  */
 -(NSString*) curlCommandLineString;
 
+
+/** Added short description by Salesforce
+ 
+ Short description is  similar to curlCommandLineString, but without the request header and does contain curl syntax
+ */
+-(NSString*) shortDescription;
+
 /*!
  *  @abstract Helper method to retrieve the contents as a NSString encoded using a specific string encoding
  *  

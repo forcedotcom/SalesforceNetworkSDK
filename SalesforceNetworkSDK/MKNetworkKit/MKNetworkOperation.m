@@ -704,6 +704,14 @@
      }];
     //  }
     
+    [displayString appendString:[self shortDescription]];
+    
+    return displayString;
+}
+
+-(NSString*) shortDescription {
+    __block NSMutableString *displayString = [NSMutableString stringWithFormat:@"%@", self.request.HTTPMethod];
+    
     [displayString appendFormat:@" \"%@\"",  self.url];
     
     if ([self.request.HTTPMethod isEqualToString:@"POST"] || [self.request.HTTPMethod isEqualToString:@"PUT"] || [self.request.HTTPMethod isEqualToString:@"PATCH"]) {
@@ -726,17 +734,13 @@
              [thisFile objectForKey:@"filepath"], [thisFile objectForKey:@"mimetype"]];
         }];
         
-        /* Not sure how to do this via curl
-         [self.dataToBePosted enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-         
-         NSDictionary *thisData = (NSDictionary*) obj;
-         [displayString appendFormat:@" --data-binary \"%@\"", [thisData objectForKey:@"data"]];
-         }];*/
+        [self.dataToBePosted enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+            [displayString appendFormat:@" --data-posted \"%@\"", obj];
+         }];
     }
     
     return displayString;
 }
-
 
 -(void) addData:(NSData*) data forKey:(NSString*) key {
     
