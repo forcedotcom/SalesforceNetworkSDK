@@ -222,6 +222,11 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         [self log:SFLogLevelError format:@"Remote request URL is nil for params %@", params];
         return nil;
     }
+    if ([url hasPrefix:@"/"]) {
+        //take out the preceding "/"
+        url = [url substringFromIndex:1];
+    }
+    
     NSString *lowerCaseUrl = [url lowercaseString];
     
     if (![lowerCaseUrl hasPrefix:@"http:"] && ![lowerCaseUrl hasPrefix:@"https:"]) {

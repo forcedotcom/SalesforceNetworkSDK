@@ -132,7 +132,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 }
 - (NSString *)description {
     if (_internalOperation) {
-        return [_internalOperation curlCommandLineString];
+        return [_internalOperation shortDescription];
     }
     else {
         return [super description];
