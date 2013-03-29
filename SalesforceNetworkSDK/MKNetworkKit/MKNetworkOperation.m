@@ -682,7 +682,7 @@
     
     NSMutableString *displayString = [NSMutableString stringWithFormat:@"%@\nRequest\n-------\n%@",
                                       [[NSDate date] descriptionWithLocale:[NSLocale currentLocale]],
-                                      [self curlCommandLineString]];
+                                      [self shortDescription]];
     
     NSString *responseString = [self responseString];
     if([responseString length] > 0) {
