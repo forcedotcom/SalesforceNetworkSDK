@@ -479,11 +479,11 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 
 #pragma mark - Reachability Methods
 - (void)reachabilityChanged:(NetworkStatus)ns {
-    _networkStatus = ns;
+    _networkStatus = (SFNetworkStatus)ns;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:SFNetworkOperationReachabilityChangedNotification object:[NSNumber numberWithInt:ns] userInfo:nil];
     if (self.reachabilityChangedHandler) {
-        self.reachabilityChangedHandler(ns);
+        self.reachabilityChangedHandler((SFNetworkStatus)ns);
     }
     
     //If need to trigger token refresh and current network status is not "NotReachable"
