@@ -759,6 +759,8 @@
                           nil];
     
     [self.dataToBePosted addObject:dict];
+    dict = nil;
+    data = nil;
 }
 
 -(void) addFile:(NSString*) filePath forKey:(NSString*) key {
@@ -1427,6 +1429,57 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     }
     for(MKNKResponseBlock responseBlock in self.responseBlocks)
         responseBlock(self);
+    
+    [self.responseBlocks removeAllObjects];
+    self.responseBlocks = nil;
+    
+    [self.errorBlocks removeAllObjects];
+    self.errorBlocks = nil;
+    
+    [self.uploadProgressChangedHandlers removeAllObjects];
+    self.uploadProgressChangedHandlers = nil;
+    
+    self.request.HTTPBody = nil;
+    self.request = nil;
+    self.connection = nil;
+//
+//    [self.downloadProgressChangedHandlers removeAllObjects];
+//    self.downloadProgressChangedHandlers = nil;
+//    
+//    for(NSOutputStream *stream in self.downloadStreams)
+//        [stream close];
+//    
+//    [self.downloadStreams removeAllObjects];
+//    self.downloadStreams = nil;
+//    
+//    self.authHandler = nil;
+//    self.mutableData = nil;
+//    self.downloadedDataSize = 0;
+//    
+//    self.cacheHandlingBlock = nil;
+//    
+//    if(self.state == MKNetworkOperationStateExecuting)
+//        self.state = MKNetworkOperationStateFinished; // This notifies the queue and removes the operation.
+//    // if the operation is not removed, the spinner continues to spin, not a good UX
+//    
+//    //Salesforce Customization
+//    self.downloadFile = nil;
+//    _cipher = nil;
+//    if (nil != self.downloadFile) {
+//        NSFileManager *fileManager = [NSFileManager defaultManager];
+//        if ([fileManager fileExistsAtPath:self.downloadFile]) {
+//            [fileManager removeItemAtPath:self.downloadFile error:nil];
+//        }
+//    }
+//    [self endBackgroundTask];
+    
+    [self.dataToBePosted removeAllObjects];
+    self.dataToBePosted = nil;
+    
+    [self.filesToBePosted removeAllObjects];
+    self.filesToBePosted = nil;
+    
+    
 }
 
 -(void) showLocalNotification {
@@ -1457,6 +1510,18 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     DLog(@"%@, [%@]", self, [self.error localizedDescription]);
     for(MKNKErrorBlock errorBlock in self.errorBlocks)
         errorBlock(error);
+    
+    [self.dataToBePosted removeAllObjects];
+    self.dataToBePosted = nil;
+    
+    [self.filesToBePosted removeAllObjects];
+    self.filesToBePosted = nil;
+    
+    [self.responseBlocks removeAllObjects];
+    self.responseBlocks = nil;
+    
+    [self.errorBlocks removeAllObjects];
+    self.errorBlocks = nil;
     
 #if TARGET_OS_IPHONE
     DLog(@"State: %d", [[UIApplication sharedApplication] applicationState]);

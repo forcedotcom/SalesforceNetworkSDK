@@ -368,8 +368,10 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     if (nil == mimeType) {
         mimeType = kDefaultFileDataMimeType;
     }
+    
     if (_internalOperation) {
         [_internalOperation addData:fileData forKey:paramName mimeType:mimeType fileName:fileName];
+        fileData = nil;
     }
 }
 
