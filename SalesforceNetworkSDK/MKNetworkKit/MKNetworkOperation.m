@@ -1472,9 +1472,6 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     }
     DLog(@"%@, [%@]", self, [self.error localizedDescription]);
     
-    self.request.HTTPBody = nil;
-    _request = nil;
-    
     for(MKNKErrorBlock errorBlock in self.errorBlocks)
         errorBlock(error);
     
