@@ -362,15 +362,31 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (nil == operationTag || nil == _internalNetworkEngine) {
         return;
     }
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
-    NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
-    for (MKNetworkOperation *operation in operations) {
+//    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
+//    NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
+    for (MKNetworkOperation *operation in [_internalNetworkEngine operations]) {
+        NSLog(@"operation tag is %@", operationTag);
         if (!operation.isFinished) {
             //only cancel cacheable operation, which means GET only
             [operation cancel];
         }
     }
 }
+
+- (NSArray *)operationsWithTag:(NSString *)operationTag {
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
+    NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
+    NSMutableArray *pendingOperations = [NSMutableArray arrayWithCapacity:operations.count];
+    
+    for (MKNetworkOperation *operation in operations) {
+        if (!operation.isFinished) {
+            //only cancel cacheable operation, which means GET only
+            [pendingOperations addObject:operation];
+        }
+    }
+    return pendingOperations;
+}
+
 - (void)suspendAllOperations {
     if (nil != _internalNetworkEngine) {
         [_internalNetworkEngine suspendAllOperations];

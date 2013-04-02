@@ -257,6 +257,10 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 - (BOOL)hasPendingOperationsWithTag:(NSString *)operationTag;
 
+/** Returns an array of operations that matches the tag */
+- (NSArray *)operationsWithTag:(NSString *)operationTag;
+
+
 /** Replay all operations stored in `operationsWaitingForAccessToken` queue
  */
 - (void)replayOperationsWaitingForAccessToken;

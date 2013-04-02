@@ -65,6 +65,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 }
 
 - (void)dealloc {
+    self.internalOperation = nil;
     self.delegate = nil;
 }
 
@@ -171,6 +172,8 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 }
 
 - (void)cancel {
+    [super cancel];
+    
     if (!_internalOperation) {
         [self log:SFLogLevelWarning msg:@"Cancel an operation that does not have internal network operation set first"];
         return;
@@ -179,7 +182,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     [[self class] deleteUnfinishedDownloadFileForOperation:self.internalOperation];
     
     [_internalOperation cancel];
-    
+
     __weak SFNetworkOperation *weakSelf = self;
     if (weakSelf.delegate && [weakSelf respondsToSelector:@selector(networkOperationDidCancel:)]) {
         if([self canCallback]) {
@@ -220,6 +223,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             [[self class] deleteUnfinishedDownloadFileForOperation:operation];
         }
     }
+    
 }
 
 - (void)setQueuePriority:(NSOperationQueuePriority)p {
@@ -368,8 +372,10 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     if (nil == mimeType) {
         mimeType = kDefaultFileDataMimeType;
     }
+    
     if (_internalOperation) {
         [_internalOperation addData:fileData forKey:paramName mimeType:mimeType fileName:fileName];
+        fileData = nil;
     }
 }
 
