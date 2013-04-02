@@ -54,7 +54,6 @@
 @property (nonatomic, strong) NSData *cachedResponse;
 @property (nonatomic, copy) MKNKResponseBlock cacheHandlingBlock;
 
-
 /**Added by Salesforce to support read from local test data*/
 @property (nonatomic, assign) BOOL readFromLocalData;
 
@@ -78,6 +77,7 @@
 
 //Added by Salesforce to support inline data encryption when data is downloaded
 - (SFCrypto *)cipher;
+- (void)clearRequestData;
 @end
 
 @implementation MKNetworkOperation
@@ -148,7 +148,7 @@
 
 -(BOOL) isCacheable {
     
-    return [self.request.HTTPMethod isEqualToString:@"GET"];
+   return [self.request.HTTPMethod isEqualToString:@"GET"];
 }
 
 
@@ -494,7 +494,7 @@
 }
 
 -(void) dealloc {
-    
+    [self clearRequestData];
     [_connection cancel];
     _connection = nil;
     _cipher = nil;
@@ -813,7 +813,7 @@
                                      [thisFile objectForKey:@"mimetype"]];
         
         [body appendData:[thisFieldString dataUsingEncoding:[self stringEncoding]]];
-        [body appendData: [NSData dataWithContentsOfFile:[thisFile objectForKey:@"filepath"]]];
+        [body appendData:[NSData dataWithContentsOfFile:[thisFile objectForKey:@"filepath"]]];
         [body appendData:[@"\r\n" dataUsingEncoding:[self stringEncoding]]];
     }];
     
@@ -856,8 +856,8 @@
     //    NSString *dataInStr = [[NSString alloc] initWithData:body encoding:NSASCIIStringEncoding];
     //    NSLog(@"body data is %@", dataInStr);
     return body;
-}
 
+}
 
 -(void) setCacheHandler:(MKNKResponseBlock) cacheHandler {
     
@@ -918,7 +918,6 @@
             [self.request setHTTPShouldUsePipelining:self.enableHttpPipelining];
         }
         if ([self.request.HTTPMethod isEqualToString:@"POST"] || [self.request.HTTPMethod isEqualToString:@"PUT"] || [self.request.HTTPMethod isEqualToString:@"PATCH"]) {
-            
             [self.request setHTTPBody:[self bodyData]];
         }
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -955,6 +954,9 @@
 
 - (BOOL)isFinished
 {
+    if (self.isCancelled) {
+        return YES;
+    }
     return (self.state == MKNetworkOperationStateFinished);
 }
 
@@ -964,20 +966,20 @@
 }
 
 -(void) cancel {
-    
+    @autoreleasepool {
+        self.request.HTTPBody = nil;
+        self.request = nil;
+    }
     if([self isFinished])
         return;
     
     @synchronized(self) {
         self.isCancelled = YES;
         
+        [self clearRequestData];
+        
         [self.connection cancel];
-        
-        [self.responseBlocks removeAllObjects];
-        self.responseBlocks = nil;
-        
-        [self.errorBlocks removeAllObjects];
-        self.errorBlocks = nil;
+        self.connection = nil;
         
         [self.uploadProgressChangedHandlers removeAllObjects];
         self.uploadProgressChangedHandlers = nil;
@@ -997,9 +999,6 @@
         
         self.cacheHandlingBlock = nil;
         
-        if(self.state == MKNetworkOperationStateExecuting)
-            self.state = MKNetworkOperationStateFinished; // This notifies the queue and removes the operation.
-        // if the operation is not removed, the spinner continues to spin, not a good UX
         
         //Salesforce Customization
         self.downloadFile = nil;
@@ -1010,6 +1009,11 @@
                 [fileManager removeItemAtPath:self.downloadFile error:nil];
             }
         }
+        if(self.state == MKNetworkOperationStateExecuting) {
+            self.state = MKNetworkOperationStateFinished; // This notifies the queue and removes the operation.
+            // if the operation is not removed, the spinner continues to spin, not a good UX
+        }
+        
         [self endBackgroundTask];
     }
     [super cancel];
@@ -1019,6 +1023,8 @@
 #pragma mark NSURLConnection delegates
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
+    self.request.HTTPBody = nil;
+    self.request = nil;
     
     self.state = MKNetworkOperationStateFinished;
     self.mutableData = nil;
@@ -1303,7 +1309,8 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
         return;
     
     self.state = MKNetworkOperationStateFinished;
-    
+    self.request.HTTPBody = nil;
+    self.request = nil;
     
     for(NSOutputStream *stream in self.downloadStreams) {
         [stream close];
@@ -1427,58 +1434,14 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
         //If canceled, do not call back
         return;
     }
-    for(MKNKResponseBlock responseBlock in self.responseBlocks)
-        responseBlock(self);
-    
-    [self.responseBlocks removeAllObjects];
-    self.responseBlocks = nil;
-    
-    [self.errorBlocks removeAllObjects];
-    self.errorBlocks = nil;
-    
-    [self.uploadProgressChangedHandlers removeAllObjects];
-    self.uploadProgressChangedHandlers = nil;
     
     self.request.HTTPBody = nil;
     self.request = nil;
-    self.connection = nil;
-//
-//    [self.downloadProgressChangedHandlers removeAllObjects];
-//    self.downloadProgressChangedHandlers = nil;
-//    
-//    for(NSOutputStream *stream in self.downloadStreams)
-//        [stream close];
-//    
-//    [self.downloadStreams removeAllObjects];
-//    self.downloadStreams = nil;
-//    
-//    self.authHandler = nil;
-//    self.mutableData = nil;
-//    self.downloadedDataSize = 0;
-//    
-//    self.cacheHandlingBlock = nil;
-//    
-//    if(self.state == MKNetworkOperationStateExecuting)
-//        self.state = MKNetworkOperationStateFinished; // This notifies the queue and removes the operation.
-//    // if the operation is not removed, the spinner continues to spin, not a good UX
-//    
-//    //Salesforce Customization
-//    self.downloadFile = nil;
-//    _cipher = nil;
-//    if (nil != self.downloadFile) {
-//        NSFileManager *fileManager = [NSFileManager defaultManager];
-//        if ([fileManager fileExistsAtPath:self.downloadFile]) {
-//            [fileManager removeItemAtPath:self.downloadFile error:nil];
-//        }
-//    }
-//    [self endBackgroundTask];
     
-    [self.dataToBePosted removeAllObjects];
-    self.dataToBePosted = nil;
+    for(MKNKResponseBlock responseBlock in self.responseBlocks)
+        responseBlock(self);
     
-    [self.filesToBePosted removeAllObjects];
-    self.filesToBePosted = nil;
-    
+    [self clearRequestData];
     
 }
 
@@ -1508,20 +1471,14 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
         return;
     }
     DLog(@"%@, [%@]", self, [self.error localizedDescription]);
+    
+    self.request.HTTPBody = nil;
+    _request = nil;
+    
     for(MKNKErrorBlock errorBlock in self.errorBlocks)
         errorBlock(error);
     
-    [self.dataToBePosted removeAllObjects];
-    self.dataToBePosted = nil;
-    
-    [self.filesToBePosted removeAllObjects];
-    self.filesToBePosted = nil;
-    
-    [self.responseBlocks removeAllObjects];
-    self.responseBlocks = nil;
-    
-    [self.errorBlocks removeAllObjects];
-    self.errorBlocks = nil;
+    [self clearRequestData];
     
 #if TARGET_OS_IPHONE
     DLog(@"State: %d", [[UIApplication sharedApplication] applicationState]);
@@ -1547,6 +1504,33 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     }
     return _cipher;
 }
+
+- (void)clearRequestData {
+    if (self.request) {
+        self.request.HTTPBody = nil;
+        self.request = nil;
+    }
+    
+    [self.responseBlocks removeAllObjects];
+    self.responseBlocks = nil;
+    
+    [self.errorBlocks removeAllObjects];
+    self.errorBlocks = nil;
+    
+    [self.uploadProgressChangedHandlers removeAllObjects];
+    self.uploadProgressChangedHandlers = nil;
+    
+    if (self.dataToBePosted) {
+        [self.dataToBePosted removeAllObjects];
+        self.dataToBePosted = nil;
+    }
+    
+    if (self.filesToBePosted) {
+        [self.filesToBePosted removeAllObjects];
+        self.filesToBePosted = nil;
+    }
+}
+
 #pragma mark - Added to suppot local testing
 //Added by Salesforce
 -(void)setLocalTestData:(NSData*)localData {
