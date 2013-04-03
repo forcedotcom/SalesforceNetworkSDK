@@ -968,7 +968,6 @@
 -(void) cancel {
     @autoreleasepool {
         self.request.HTTPBody = nil;
-        self.request = nil;
     }
     if([self isFinished])
         return;
@@ -976,10 +975,15 @@
     @synchronized(self) {
         self.isCancelled = YES;
         
+        [self.connection cancel];
+        
         [self clearRequestData];
         
-        [self.connection cancel];
-        self.connection = nil;
+        [self.responseBlocks removeAllObjects];
+        self.responseBlocks = nil;
+        
+        [self.errorBlocks removeAllObjects];
+        self.errorBlocks = nil;
         
         [self.uploadProgressChangedHandlers removeAllObjects];
         self.uploadProgressChangedHandlers = nil;
@@ -1023,9 +1027,6 @@
 #pragma mark NSURLConnection delegates
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    self.request.HTTPBody = nil;
-    self.request = nil;
-    
     self.state = MKNetworkOperationStateFinished;
     self.mutableData = nil;
     self.downloadedDataSize = 0;
@@ -1309,8 +1310,7 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
         return;
     
     self.state = MKNetworkOperationStateFinished;
-    self.request.HTTPBody = nil;
-    self.request = nil;
+    [self clearRequestData];
     
     for(NSOutputStream *stream in self.downloadStreams) {
         [stream close];
@@ -1505,26 +1505,6 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
 - (void)clearRequestData {
     if (self.request) {
         self.request.HTTPBody = nil;
-        self.request = nil;
-    }
-    
-    [self.responseBlocks removeAllObjects];
-    self.responseBlocks = nil;
-    
-    [self.errorBlocks removeAllObjects];
-    self.errorBlocks = nil;
-    
-    [self.uploadProgressChangedHandlers removeAllObjects];
-    self.uploadProgressChangedHandlers = nil;
-    
-    if (self.dataToBePosted) {
-        [self.dataToBePosted removeAllObjects];
-        self.dataToBePosted = nil;
-    }
-    
-    if (self.filesToBePosted) {
-        [self.filesToBePosted removeAllObjects];
-        self.filesToBePosted = nil;
     }
 }
 
