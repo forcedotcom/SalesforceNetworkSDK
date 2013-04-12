@@ -138,6 +138,10 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
 /**Cache policy for this operation. Default value is NSURLRequestReloadIgnoringLocalCacheData*/
 @property (nonatomic, assign) NSURLRequestCachePolicy cachePolicy;
 
+/** HTTP headers for the response
+ */
+@property (nonatomic, readonly, strong) NSDictionary *responseHeaders;
+
 ///---------------------------------------------------------------
 /// @name Post Method
 ///---------------------------------------------------------------
