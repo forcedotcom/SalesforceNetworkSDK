@@ -504,7 +504,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         }
         
         //If delegate did not implement operationDidTimeout or error is not timedout error
-        if ([weakSelf.delegate respondsToSelector:@selector(networkOoperation:didFailWithError:)]) {
+        if ([weakSelf.delegate respondsToSelector:@selector(networkOperation:didFailWithError:)]) {
             if([self canCallback]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     if (error.code == kCFURLErrorTimedOut) {

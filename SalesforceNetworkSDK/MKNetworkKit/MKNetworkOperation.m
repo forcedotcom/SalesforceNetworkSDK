@@ -1473,7 +1473,11 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
         //If canceled, do not call back
         return;
     }
-    DLog(@"%@, [%@]", self, [self.error localizedDescription]);
+    
+    BOOL notModified = 304 == error.code;
+    if (!notModified) {
+        DLog(@"%@, [%@]", self, [self.error localizedDescription]);
+    }
     
     for(MKNKErrorBlock errorBlock in self.errorBlocks)
         errorBlock(error);
@@ -1481,7 +1485,9 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
     [self clearRequestData];
     
 #if TARGET_OS_IPHONE
-    DLog(@"State: %d", [[UIApplication sharedApplication] applicationState]);
+    if (!notModified) {
+        DLog(@"State: %d", [[UIApplication sharedApplication] applicationState]);        
+    }
     if([[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground)
         [self showLocalNotification];
 #endif
