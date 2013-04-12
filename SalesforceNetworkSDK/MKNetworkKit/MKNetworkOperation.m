@@ -1342,6 +1342,9 @@ totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
         }
         else if(self.response.statusCode == 304) {
             DLog(@"%@ not modified", self.url);
+            [self operationFailedWithError:[NSError errorWithDomain:NSURLErrorDomain
+                                                               code:self.response.statusCode
+                                                           userInfo:self.response.allHeaderFields]];
         }
         else if(self.response.statusCode == 307) {
             DLog(@"%@ temporarily redirected", self.url);

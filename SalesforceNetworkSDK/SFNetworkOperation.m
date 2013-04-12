@@ -151,6 +151,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         [_internalOperation setHeaders:customHeaders];
     }
 }
+
+- (NSDictionary*)responseHeaders {
+    return _internalOperation.cacheHeaders;
+}
+
 - (void)setEncryptDownloadedFile:(BOOL)encryptDownloadedFile {
     _encryptDownloadedFile = encryptDownloadedFile;
     if (_internalOperation) {
