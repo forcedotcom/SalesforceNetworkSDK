@@ -451,6 +451,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         return;
     }
     
+    // Ignore 304 (not modified) error to avoid deleting any data associated with this operation
+    if (304 == error.code) {
+        return;
+    }
+    
     NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
     if (serviceError) {
         error = serviceError;
