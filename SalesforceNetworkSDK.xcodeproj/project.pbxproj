@@ -13,7 +13,7 @@
 		100F54511614E2CB00FD5EB8 /* SFNetworkEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B76166161276F700B3CD58 /* SFNetworkEngine.m */; };
 		100F54521614E2CE00FD5EB8 /* SFNetworkOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B76168161276F700B3CD58 /* SFNetworkOperation.m */; };
 		100F54531614E2D000FD5EB8 /* SFNetworkUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 10B7616A161276F700B3CD58 /* SFNetworkUtils.m */; };
-		100F54781614EAAA00FD5EB8 /* NSData+Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54661614EAAA00FD5EB8 /* NSData+Base64.h */; };
+		100F54781614EAAA00FD5EB8 /* NSData+Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54661614EAAA00FD5EB8 /* NSData+Base64.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		100F54791614EAAA00FD5EB8 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54671614EAAA00FD5EB8 /* NSData+Base64.m */; };
 		100F547A1614EAAA00FD5EB8 /* NSDate+RFC1123.h in Headers */ = {isa = PBXBuildFile; fileRef = 100F54681614EAAA00FD5EB8 /* NSDate+RFC1123.h */; };
 		100F547B1614EAAA00FD5EB8 /* NSDate+RFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 100F54691614EAAA00FD5EB8 /* NSDate+RFC1123.m */; };
@@ -197,10 +197,10 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				100F54781614EAAA00FD5EB8 /* NSData+Base64.h in Headers */,
 				100F54091614E03800FD5EB8 /* SFNetworkEngine.h in Headers */,
 				100F540A1614E04300FD5EB8 /* SFNetworkOperation.h in Headers */,
 				100F540B1614E04900FD5EB8 /* SFNetworkUtils.h in Headers */,
-				100F54781614EAAA00FD5EB8 /* NSData+Base64.h in Headers */,
 				100F547A1614EAAA00FD5EB8 /* NSDate+RFC1123.h in Headers */,
 				100F547C1614EAAA00FD5EB8 /* NSDictionary+RequestEncoding.h in Headers */,
 				100F547E1614EAAA00FD5EB8 /* NSString+MKNetworkKitAdditions.h in Headers */,
