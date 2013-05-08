@@ -461,7 +461,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         error = serviceError;
     }
     
-    [self log:SFLogLevelError format:@"callDelegateDidFailWithError %@", error];
+    [self log:SFLogLevelError format:@"callDelegateDidFailWithError %@", [error localizedDescription]];
     __weak SFNetworkOperation *weakSelf = self;
     [[self class] deleteUnfinishedDownloadFileForOperation:weakSelf.internalOperation];
     
@@ -534,7 +534,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 }
 
 - (NSError *)checkForErrorInResponseStr:(NSString *)responseStr withError:(NSError * )error {
-    if (error || nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
+    if (nil == responseStr || (![responseStr hasPrefix:@"{"] && ![responseStr hasPrefix:@"["])) {
         //Not JSON format
         return error;
     }
@@ -545,15 +545,20 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         if ([jsonResponse count] == 1) {
             id potentialError = [jsonResponse objectAtIndex:0];
             if ([potentialError isKindOfClass:[NSDictionary class]]) {
-                NSString *potentialErrorCode = [potentialError objectForKey:kErrorCodeKeyInResponse];
-                if (nil != potentialErrorCode) {
-                        NSError *error = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:kFailedWithServerReturnedErrorCode userInfo:potentialError];
-                    return error;
+                NSDictionary *errorDictionary = (NSDictionary *)potentialError;
+                NSString *potentialErrorCode = errorDictionary[kErrorCodeKeyInResponse];
+                NSString *potentialErrorMessage  = errorDictionary[kErrorMessageKeyInResponse];
+                if (nil != potentialErrorCode && nil != potentialErrorMessage) {
+                    NSDictionary *errorDictionary = @{
+                                                      NSLocalizedDescriptionKey : potentialErrorMessage,
+                                                      NSLocalizedFailureReasonErrorKey : potentialErrorCode };
+                    NSError *translatedError = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:kFailedWithServerReturnedErrorCode userInfo:errorDictionary];
+                    return translatedError;
                 }
             }
         }
     }
-    return nil;
+    return error;
 }
 
 - (BOOL)shouldRetryOperation:(SFNetworkOperation *)operation onNetworkError:(NSError *)error {

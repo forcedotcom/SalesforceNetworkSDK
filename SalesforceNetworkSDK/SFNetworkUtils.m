@@ -9,6 +9,8 @@
 #import "SFNetworkUtils.h"
 
 NSString * const kErrorCodeKeyInResponse = @"errorCode";
+NSString * const kErrorMessageKeyInResponse = @"message";
+
 NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";
 
 
