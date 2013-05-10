@@ -552,7 +552,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                     NSDictionary *errorDictionary = @{
                                                       NSLocalizedDescriptionKey : potentialErrorMessage,
                                                       NSLocalizedFailureReasonErrorKey : potentialErrorCode };
-                    NSError *translatedError = [NSError errorWithDomain:kSFNetworkOperationErrorDomain code:kFailedWithServerReturnedErrorCode userInfo:errorDictionary];
+                    NSError *translatedError = [NSError errorWithDomain:error.domain code:error.code userInfo:errorDictionary];
                     return translatedError;
                 }
             }
