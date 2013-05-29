@@ -470,11 +470,8 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     [headers setValue:@"gzip" forKey:@"Accept-Encoding"];
     
     //read user agent from user defaults, this value will be populated by mobileSDK if it is used
-    NSString *userAgent = [[NSUserDefaults standardUserDefaults] valueForKey:@"UserAgent"];
-    if (nil == userAgent) {
-        //If not populated info.plist, generate the common user agent with includes app product name, version, OS version and device type
-        userAgent = [NSString userAgentString];
-    }
+    NSString *userAgent = [NSString userAgentString];
+   
     if (nil != userAgent) {
         [headers setValue:userAgent forKey:@"User-Agent"];
     }
