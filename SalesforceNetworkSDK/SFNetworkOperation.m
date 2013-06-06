@@ -13,7 +13,6 @@
 #import "SFNetworkUtils.h"
 
 static NSString *kDefaultFileDataMimeType = @"multipart/form-data";
-static NSString *kSFNetworkOperationErrorDomain = @"com.salesforce.SFNetworkSDK.ErrorDomain";
 static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 
 @implementation SFNetworkOperation
