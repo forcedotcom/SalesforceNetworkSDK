@@ -736,7 +736,9 @@
              [thisFile objectForKey:@"filepath"], [thisFile objectForKey:@"mimetype"]];
         }];
         
-        // Modified by Salesforce
+        // Modified by Salesforce - We currently log the operation so we can see URL's and data that is flowing to the server.
+        // However, when an image or file is posted the bytes printed is way to much.
+        // https://gus.salesforce.com/a07B0000000UwZzIAK
         [self.dataToBePosted enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             [displayString appendString:@"\n --data-posted \"{\n"];
             if ([obj isKindOfClass:[NSDictionary class]]) {
