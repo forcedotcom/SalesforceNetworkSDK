@@ -34,8 +34,8 @@
 #error MKNetworkKit is ARC only. Either turn on ARC for the project or use -fobjc-arc flag
 #endif
 
-#define kMKNetworkEngineMaxWifiConnections 8
-#define kMKNetworkEngineMaxWWANConnections 4
+#define kMKNetworkEngineMaxWifiConnections 6
+#define kMKNetworkEngineMaxWWANConnections 2
 
 @interface MKNetworkEngine (/*Private Methods*/)
 
