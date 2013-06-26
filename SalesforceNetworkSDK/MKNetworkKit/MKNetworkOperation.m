@@ -25,6 +25,8 @@
 
 #import "MKNetworkKit.h"
 
+#define MKNetworkKitDataTruncation 500
+
 #ifdef __OBJC_GC__
 #error MKNetworkKit does not support Objective-C Garbage Collection
 #endif
@@ -734,8 +736,29 @@
              [thisFile objectForKey:@"filepath"], [thisFile objectForKey:@"mimetype"]];
         }];
         
+        // Modified by Salesforce - We currently log the operation so we can see URL's and data that is flowing to the server.
+        // However, when an image or file is posted the bytes printed is way to much.
+        // https://gus.salesforce.com/a07B0000000UwZzIAK
         [self.dataToBePosted enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            [displayString appendFormat:@" --data-posted \"%@\"", obj];
+            [displayString appendString:@"\n --data-posted \"{\n"];
+            if ([obj isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *dictionary = (NSDictionary*)obj;
+                
+                [dictionary enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+                    BOOL didTruncate = NO;
+                    id objectToPrint = obj;
+                    if ([@"data" isEqualToString:key] && [obj isKindOfClass:[NSData class]]) {
+                        NSData *data = (NSData*)obj;
+                        NSUInteger length = [data length];
+                        if (length > MKNetworkKitDataTruncation) {
+                            didTruncate = YES;
+                            objectToPrint = [NSData dataWithBytes:[data bytes] length:MKNetworkKitDataTruncation];
+                        }
+                    } 
+                   [displayString appendFormat:@"\t \"%@\" = \"%@%@\"\n", key, objectToPrint, didTruncate?@"...(truncated)":@""];
+                }];
+            }
+            [displayString appendString:@" }\""];
          }];
     }
     
