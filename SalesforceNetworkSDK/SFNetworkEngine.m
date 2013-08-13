@@ -156,7 +156,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
             [self setHeaderValue:token forKey:kAuthoriationHeaderKey];
         }
         if (self.operationsWaitingForAccessToken.count > 0) {
-            [self log:SFLogLevelDebug format:@"Start to replay operationsWaitingForAccessToken"];
+            [self log:SFLogLevelInfo msg:@"Start to replay operationsWaitingForAccessToken"];
             [self replayOperationsWaitingForAccessToken];
         }
     }
@@ -522,6 +522,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         if (!self.isAccessTokenBeingRefreshed) {
             _accessTokenBeingRefreshed = YES;
             if (self.delegate) {
+                [self log:SFLogLevelInfo msg:@"start refresh access token flow"];
                 [self.delegate refreshSessionForNetworkEngine:self];
             }
         }
@@ -533,6 +534,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (nil == operation) {
         return;
     }
+    
     [self startRefreshAccessTokenFlow];
     
     SFNetworkOperation *newOperation = [self cloneOperation:operation];

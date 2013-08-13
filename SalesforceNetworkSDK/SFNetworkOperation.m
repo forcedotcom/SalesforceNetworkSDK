@@ -468,7 +468,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         if ([SFNetworkEngine sharedInstance].delegate) {
             // queue failed operation if networkengine has delegate assigned
             // if delegate is not assigned, treat timeout as regular error
-            [weakSelf log:SFLogLevelError msg:@"Session timeout encountered. Automatically retry starts"];
+            [weakSelf log:SFLogLevelError format:@"Session timeout encountered. Requeue % for retry later", weakSelf];
             [[SFNetworkEngine sharedInstance] queueOperationOnExpiredAccessToken:weakSelf];
             return;
         }
@@ -477,7 +477,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     
     
     if ([weakSelf shouldRetryOperation:weakSelf onNetworkError:error]) {
-        [weakSelf log:SFLogLevelError msg:@"Network error encountered. Automatically retry starts"];
+        [weakSelf log:SFLogLevelError format:@"Network error encountered. Requeue % for retry later", weakSelf];
         //Increase the current retry count
         _numOfRetriesForNetworkError++;
         [[SFNetworkEngine sharedInstance] queueOperationOnNetworkError:weakSelf];
