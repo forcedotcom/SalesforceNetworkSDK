@@ -535,6 +535,15 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         return;
     }
     
+    NSString *hostName = [self remoteHost];
+    
+    // add logic to check for mismatching host name to prevent trying to re-queue request that errors out
+    // with invalid session due to mis-matched host
+    if ([operation.url rangeOfString:hostName].location == NSNotFound) {
+        [self log:SFLogLevelError format:@"Ignore session timeout error callback as host URL changed, request URL is %@, login host is [%@]", operation.url, hostName];
+        return;
+    }
+    
     [self startRefreshAccessTokenFlow];
     
     SFNetworkOperation *newOperation = [self cloneOperation:operation];
