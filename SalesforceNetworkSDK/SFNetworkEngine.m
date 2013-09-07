@@ -20,6 +20,7 @@ NSString * const SFNetworkOperationPostMethod = @"POST";
 NSString * const SFNetworkOperationPutMethod = @"PUT";
 NSString * const SFNetworkOperationDeleteMethod = @"DELETE";
 NSString * const SFNetworkOperationPatchMethod = @"PATCH";
+NSString * const SFNetworkOperationHeadMethod = @"HEAD";
 
 #pragma mark - Notification Name
 NSString * const SFNetworkOperationReachabilityChangedNotification = @"SFNetworkOperationReachabilityChangedNotification";

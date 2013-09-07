@@ -234,6 +234,6 @@ typedef NSString* (^SFNetworkOperationEncodingBlock) (NSDictionary* postDataDict
  *
  * @return the respoonse as an image; nil if the operation is in progress or the response is not a valid image
  */
-- (UIImage *)responseAsImage;
+// - (UIImage *)responseAsImage;
 
 @end

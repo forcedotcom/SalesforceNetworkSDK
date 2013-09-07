@@ -22,6 +22,7 @@ extern NSString * const SFNetworkOperationPostMethod;
 extern NSString * const SFNetworkOperationPutMethod;
 extern NSString * const SFNetworkOperationDeleteMethod;
 extern NSString * const SFNetworkOperationPatchMethod;
+extern NSString * const SFNetworkOperationHeadMethod;
 
 /** Notification that will be posted when SFNetworkEngine detects network change
  
