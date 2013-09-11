@@ -285,6 +285,10 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     return [self operationWithUrl:url params:params httpMethod:SFNetworkOperationPatchMethod ssl:YES];
 }
 
+- (SFNetworkOperation *)head:(NSString *)url params:(NSDictionary *)params {
+    return [self operationWithUrl:url params:params httpMethod:SFNetworkOperationHeadMethod ssl:YES];
+}
+
 #pragma mark - Operations Methods
 - (SFNetworkOperation *)activeOperationWithUrl:(NSString *)url params:(NSDictionary *)params httpMethod:(NSString *)method {
     if ([NSString isEmpty:url]) {

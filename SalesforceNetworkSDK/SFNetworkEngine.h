@@ -205,6 +205,13 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 - (SFNetworkOperation *)patch:(NSString *)url params:(NSDictionary *)params;
 
+/** Returns a `SFNetworkOperation` that can be used to execute the specified remote call using `SFNetworkOperationPathMethod` method under SSL
+ 
+ * @param url Url to the remote service to invoke. If this url is a relative URL, `[[SFOAuthCoordinator credentials] instanceUrl]` will be automatically added to it
+ * @param params Key & value pair as request parameters
+ */
+- (SFNetworkOperation *)head:(NSString *)url params:(NSDictionary *)params;
+
 /**Returns `SFNetworkOperation` for the specified condition
  
  * @param url Url to the remote service to invoke. This url does not start with HTTP protocol (http or https), `[[SFOAuthCoordinator credentials] instanceUrl]` will be automatically added to the url that will be executed
