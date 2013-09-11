@@ -1,0 +1,3 @@
+[submodule "external/MKNetworkKit"]
+	path = external/MKNetworkKit
+	url = git@github.com:wmathurin/MKNetworkKit
