@@ -389,8 +389,6 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth/Libraries\"",
-					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth\"",
 					"$(SRCROOT)/dependencies/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
@@ -407,8 +405,6 @@
 				GCC_PREFIX_HEADER = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth/Libraries\"",
-					"\"$(SRCROOT)/SalesforceNetworkSDK/dependencies/SalesforceOAuth\"",
 					"$(SRCROOT)/dependencies/**",
 				);
 				OTHER_LDFLAGS = "-ObjC";
