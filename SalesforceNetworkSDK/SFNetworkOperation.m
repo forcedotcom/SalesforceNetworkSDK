@@ -77,7 +77,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         NSMutableDictionary *mutableHeaders = [NSMutableDictionary dictionaryWithDictionary:[self customHeaders]];
         [mutableHeaders setValue:value forKey:key];
         self.customHeaders = mutableHeaders;
-        [_internalOperation setHeaderValue:value forKey:key];
+        [_internalOperation setHeader:key withValue:value];
     }
 }
 

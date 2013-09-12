@@ -294,6 +294,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/dependencies/**",
 					"$(PROJECT_DIR)/../../external/ThirdPartyDependencies/**",
+					"$(PROJECT_DIR)/../../external/MKNetworkKit/MKNetworkKit/**",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -311,6 +312,11 @@
 				DSTROOT = /tmp/SalesforceNetworkSDK.dst;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "SalesforceNetworkSDK/SalesforceNetworkSDK-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/dependencies/**",
+					"$(PROJECT_DIR)/../../external/ThirdPartyDependencies/**",
+					"$(PROJECT_DIR)/../../external/MKNetworkKit/MKNetworkKit/**",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/dependencies/**",

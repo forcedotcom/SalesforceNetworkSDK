@@ -127,7 +127,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         
         // Only if we have a internal Network Engine
         if(_internalNetworkEngine) {
-            [self.internalNetworkEngine cancellAllOperations];
+            [self.internalNetworkEngine cancelAllOperations];
         }
     }
 }
@@ -358,7 +358,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 
 - (void)cancelAllOperations {
     if (nil != _internalNetworkEngine) {
-        [_internalNetworkEngine cancellAllOperations];
+        [_internalNetworkEngine cancelAllOperations];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:SFNetworkOperationEngineOperationCancelledNotification object:nil userInfo:nil];
 }
