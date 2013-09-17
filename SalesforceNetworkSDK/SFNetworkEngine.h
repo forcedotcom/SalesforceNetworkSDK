@@ -239,6 +239,10 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
  */
 - (BOOL)isReachable;
 
+/** Fatal OAuth error happened. Call error block of all operations stored in `operationsWaitingForAccessToken` queue
+ */
+- (void)failOperationsWaitingForAccessTokenWithError:(NSError *)error;
+
 /** Cancel all operations that are waiting to be excecuted
  */
 - (void)cancelAllOperations;

@@ -59,10 +59,6 @@
  */
 - (void)queueOperationOnExpiredAccessToken:(SFNetworkOperation *)operation;
 
-/** Fatal OAuth error happened. Call error block of all operations stored in `operationsWaitingForAccessToken` queue
- */
-- (void)failOperationsWaitingForAccessTokenWithError:(NSError *)error;
-
 /** Queue `SFNetworkOperation` due to network error
  */
 - (void)queueOperationOnNetworkError:(SFNetworkOperation *)operation;
