@@ -54,9 +54,9 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         self.cachePolicy = NSURLRequestReloadIgnoringLocalCacheData;
         
         __weak SFNetworkOperation *weakSelf = self;
-        [_internalOperation onCompletion:^(MKNetworkOperation *completedOperation) {
+        [_internalOperation addCompletionHandler:^(MKNetworkOperation *completedOperation) {
             [weakSelf callDelegateDidFinish:completedOperation];
-        } onError:^(NSError *error) {
+        } errorHandler:^(MKNetworkOperation *operation, NSError *error) {
             [weakSelf callDelegateDidFailWithError:error];
         }];
     }
