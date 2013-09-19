@@ -188,7 +188,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     [_internalOperation cancel];
 
     __weak SFNetworkOperation *weakSelf = self;
-    if (weakSelf.delegate && [weakSelf respondsToSelector:@selector(networkOperationDidCancel:)]) {
+    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(networkOperationDidCancel:)]) {
         if([self canCallback]) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                 [self.delegate networkOperationDidCancel:weakSelf];
@@ -498,9 +498,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             if ([weakSelf.delegate respondsToSelector:@selector(networkOperationDidTimeout:)]) {
                 if([self canCallback]) {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                        if (error.code == kCFURLErrorTimedOut) {
-                            [weakSelf.delegate networkOperationDidTimeout:weakSelf];
-                        }
+                        [weakSelf.delegate networkOperationDidTimeout:weakSelf];
                     });
                 }
                 return;
@@ -511,9 +509,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         if ([weakSelf.delegate respondsToSelector:@selector(networkOperation:didFailWithError:)]) {
             if([self canCallback]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                    if (error.code == kCFURLErrorTimedOut) {
-                        [weakSelf.delegate networkOperation:weakSelf didFailWithError:error];
-                    }
+                    [weakSelf.delegate networkOperation:weakSelf didFailWithError:error];
                 });
             }
             return;

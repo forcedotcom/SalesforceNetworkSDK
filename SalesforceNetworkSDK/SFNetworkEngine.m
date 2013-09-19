@@ -369,7 +369,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     }
 //    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
 //    NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
-    for (MKNetworkOperation *operation in [_internalNetworkEngine operations]) {
+    for (MKNetworkOperation *operation in [self operationsWithTag:operationTag]) {
         NSLog(@"operation tag is %@", operationTag);
         if (!operation.isFinished) {
             //only cancel cacheable operation, which means GET only
@@ -585,13 +585,14 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         _accessTokenBeingRefreshed = NO;
         safeCopy = [self.operationsWaitingForAccessToken copy];
         [self.operationsWaitingForAccessToken removeAllObjects];
+        NSLog(@"failOperationsWaitingForAccessTokenWithError %d entries", [safeCopy count]);
     }
     
     for (SFNetworkOperation *operation in safeCopy) {
         MKNetworkOperation *internalOperation = operation.internalOperation;
-        NSArray *errorBlocks = [internalOperation errorBlocks];
-        for (MKNKErrorBlock errorBlock in errorBlocks) {
-            errorBlock(error);
+        NSArray *errorBlocks = [internalOperation errorBlocksType2];
+        for (MKNKResponseErrorBlock errorBlock in errorBlocks) {
+            errorBlock(operation, error);
         }
     }
 }
