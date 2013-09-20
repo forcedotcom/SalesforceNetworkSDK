@@ -485,14 +485,10 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
     
     if (weakSelf.delegate) {
-        if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
-            //Permission denied error
-            //Server side sometimes return 403 with JSON object to
-            //indicate permission denied error
-            NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString withError:error];
-            if (potentialError) {
-                error = potentialError;
-            }
+        // If server sends back json error, we want it populated in our error object
+        NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString withError:error];
+        if (potentialError) {
+            error = potentialError;
         }
         if (error.code == kCFURLErrorTimedOut) {
             if ([weakSelf.delegate respondsToSelector:@selector(networkOperationDidTimeout:)]) {
