@@ -280,7 +280,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 - (void)addCompletionBlock:(SFNetworkOperationCompletionBlock)completionBlock errorBlock:(SFNetworkOperationErrorBlock)errorBlock{
     if (_internalOperation) {
         __weak SFNetworkOperation *weakSelf = self;
-        [_internalOperation onCompletion:^(MKNetworkOperation *completedOperation) {
+        [_internalOperation addCompletionHandler:^(MKNetworkOperation *completedOperation) {
             if([self canCallback]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     //Perform all callbacks in background queue
@@ -295,7 +295,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                     };
                 });
             }
-        } onError:^(NSError *error) {
+        } errorHandler:^(MKNetworkOperation *operation, NSError *error) {
             NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
             if (serviceError) {
                 error = serviceError;
@@ -313,15 +313,6 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             }
             
             if (errorBlock) {
-                if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
-                    //Permission denied error
-                    NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
-                    
-                    if (potentialError) {
-                        error = potentialError;
-                    }
-                }
-                
                 if([self canCallback]) {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                         errorBlock(error);
