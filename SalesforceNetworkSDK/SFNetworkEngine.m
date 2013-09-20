@@ -585,7 +585,6 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         _accessTokenBeingRefreshed = NO;
         safeCopy = [self.operationsWaitingForAccessToken copy];
         [self.operationsWaitingForAccessToken removeAllObjects];
-        NSLog(@"failOperationsWaitingForAccessTokenWithError %d entries", [safeCopy count]);
     }
     
     for (SFNetworkOperation *operation in safeCopy) {
