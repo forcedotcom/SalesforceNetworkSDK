@@ -188,7 +188,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     [_internalOperation cancel];
 
     __weak SFNetworkOperation *weakSelf = self;
-    if (weakSelf.delegate && [weakSelf respondsToSelector:@selector(networkOperationDidCancel:)]) {
+    if (weakSelf.delegate && [weakSelf.delegate respondsToSelector:@selector(networkOperationDidCancel:)]) {
         if([self canCallback]) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                 [self.delegate networkOperationDidCancel:weakSelf];
@@ -280,7 +280,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 - (void)addCompletionBlock:(SFNetworkOperationCompletionBlock)completionBlock errorBlock:(SFNetworkOperationErrorBlock)errorBlock{
     if (_internalOperation) {
         __weak SFNetworkOperation *weakSelf = self;
-        [_internalOperation onCompletion:^(MKNetworkOperation *completedOperation) {
+        [_internalOperation addCompletionHandler:^(MKNetworkOperation *completedOperation) {
             if([self canCallback]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     //Perform all callbacks in background queue
@@ -295,7 +295,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                     };
                 });
             }
-        } onError:^(NSError *error) {
+        } errorHandler:^(MKNetworkOperation *operation, NSError *error) {
             NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
             if (serviceError) {
                 error = serviceError;
@@ -313,15 +313,6 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             }
             
             if (errorBlock) {
-                if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
-                    //Permission denied error
-                    NSError *potentialError = [weakSelf checkForErrorInResponse:weakSelf.internalOperation];
-                    
-                    if (potentialError) {
-                        error = potentialError;
-                    }
-                }
-                
                 if([self canCallback]) {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                         errorBlock(error);
@@ -485,22 +476,11 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
     
     if (weakSelf.delegate) {
-        if ([SFNetworkUtils typeOfError:error] == SFNetworkOperationErrorTypeAccessDenied) {
-            //Permission denied error
-            //Server side sometimes return 403 with JSON object to
-            //indicate permission denied error
-            NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString withError:error];
-            if (potentialError) {
-                error = potentialError;
-            }
-        }
         if (error.code == kCFURLErrorTimedOut) {
             if ([weakSelf.delegate respondsToSelector:@selector(networkOperationDidTimeout:)]) {
                 if([self canCallback]) {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                        if (error.code == kCFURLErrorTimedOut) {
-                            [weakSelf.delegate networkOperationDidTimeout:weakSelf];
-                        }
+                        [weakSelf.delegate networkOperationDidTimeout:weakSelf];
                     });
                 }
                 return;
@@ -511,9 +491,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
         if ([weakSelf.delegate respondsToSelector:@selector(networkOperation:didFailWithError:)]) {
             if([self canCallback]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-                    if (error.code == kCFURLErrorTimedOut) {
-                        [weakSelf.delegate networkOperation:weakSelf didFailWithError:error];
-                    }
+                    [weakSelf.delegate networkOperation:weakSelf didFailWithError:error];
                 });
             }
             return;

@@ -369,7 +369,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     }
 //    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"tag = %@", operationTag];
 //    NSArray *operations = [[_internalNetworkEngine operations] filteredArrayUsingPredicate:predicate];
-    for (MKNetworkOperation *operation in [_internalNetworkEngine operations]) {
+    for (MKNetworkOperation *operation in [self operationsWithTag:operationTag]) {
         NSLog(@"operation tag is %@", operationTag);
         if (!operation.isFinished) {
             //only cancel cacheable operation, which means GET only
@@ -551,7 +551,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     
     [self startRefreshAccessTokenFlow];
     
-    SFNetworkOperation *newOperation = [self cloneOperation:operation];
+    SFNetworkOperation *newOperation = [self cloneInternalOperation:operation];
     if (newOperation) {
         @synchronized(self) {
             [self.operationsWaitingForAccessToken addObject:newOperation];
@@ -589,9 +589,9 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     
     for (SFNetworkOperation *operation in safeCopy) {
         MKNetworkOperation *internalOperation = operation.internalOperation;
-        NSArray *errorBlocks = [internalOperation errorBlocks];
-        for (MKNKErrorBlock errorBlock in errorBlocks) {
-            errorBlock(error);
+        NSArray *errorBlocks = [internalOperation errorBlocksType2];
+        for (MKNKResponseErrorBlock errorBlock in errorBlocks) {
+            errorBlock(internalOperation, error);
         }
     }
 }
@@ -602,7 +602,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         return;
     }
     
-    SFNetworkOperation *newOperation = [self cloneOperation:operation];
+    SFNetworkOperation *newOperation = [self cloneInternalOperation:operation];
     if (newOperation) {
         @synchronized(self) {
             [self.operationsWaitingForNetwork addObject:newOperation];
@@ -655,7 +655,7 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 
 #pragma mark - Clone Operation
 #pragma mark - Copying Protocol
-- (SFNetworkOperation *)cloneOperation:(SFNetworkOperation *)operation {
+- (SFNetworkOperation *)cloneInternalOperation:(SFNetworkOperation *)operation {
     if (nil == operation) {
         return nil;
     }
@@ -664,47 +664,22 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     if (nil == internalOperation) {
         return nil;
     }
-    
-    SFNetworkOperation *newOpeartion = [self operationWithUrl:operation.url params:internalOperation.fieldsToBePosted httpMethod:operation.method ssl:operation.useSSL];
-    
-    //Set Headers
-    newOpeartion.customHeaders = operation.customHeaders;
-    newOpeartion.requiresAccessToken = operation.requiresAccessToken;
-    
-    //Clone all properties
-    newOpeartion.maximumNumOfRetriesForNetworkError = operation.maximumNumOfRetriesForNetworkError;
-    newOpeartion.numOfRetriesForNetworkError = operation.numOfRetriesForNetworkError;
-    newOpeartion.queuePriority = operation.queuePriority;
-    newOpeartion.tag = operation.tag;
-    newOpeartion.expectedDownloadSize = operation.expectedDownloadSize;
-    newOpeartion.operationTimeout = operation.operationTimeout;
-    newOpeartion.delegate = operation.delegate;
-    newOpeartion.encryptDownloadedFile = operation.encryptDownloadedFile;
-    newOpeartion.pathToStoreDownloadedContent = operation.pathToStoreDownloadedContent;
-    newOpeartion.cachePolicy = operation.cachePolicy;
-    [newOpeartion.cancelBlocks addObjectsFromArray:operation.cancelBlocks];
-    
-    //Clone all callbacks
-    MKNetworkOperation *newInternalOperation = newOpeartion.internalOperation;
+
+    // Cloning internal operation
+    MKNetworkOperation *newInternalOperation = [[self internalNetworkEngine] operationWithURLString:operation.url params:internalOperation.fieldsToBePosted httpMethod:operation.method];
+    newInternalOperation.enableHttpPipelining = self.enableHttpPipeling;
+    newInternalOperation.freezable = NO;
     [newInternalOperation updateHandlersFromOperation:internalOperation];
-    
-    //Add file data if exists
-    if (internalOperation.dataToBePosted.count > 0) {
-        for (NSDictionary *fileDict in internalOperation.dataToBePosted) {
-            NSString *paramName = [fileDict valueForKey:@"name"];
-            NSString *fileName = [fileDict valueForKey:@"filename"];
-            NSData *fileData = [fileDict objectForKey:@"data"];
-            NSString *mimeType = [fileDict valueForKey:@"mimetype"];
-            [newOpeartion addPostFileData:fileData paramName:paramName fileName:fileName mimeType:mimeType];
-        }
-    }
     
     //Clone custom encoding handler
     if (internalOperation.postDataEncodingHandler) {
         [newInternalOperation setCustomPostDataEncodingHandler:internalOperation.postDataEncodingHandler forType:operation.customPostDataEncodingContentType];
     }
+
+    // Have operation use the new internal operation
+    operation.internalOperation = newInternalOperation;
     
-    return newOpeartion;
+    return operation;
 }
 
 #pragma mark - Local Test Data Support
