@@ -476,11 +476,6 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     }
     
     if (weakSelf.delegate) {
-        // If server sends back json error, we want it populated in our error object
-        NSError *potentialError = [weakSelf checkForErrorInResponseStr:self.responseAsString withError:error];
-        if (potentialError) {
-            error = potentialError;
-        }
         if (error.code == kCFURLErrorTimedOut) {
             if ([weakSelf.delegate respondsToSelector:@selector(networkOperationDidTimeout:)]) {
                 if([self canCallback]) {
