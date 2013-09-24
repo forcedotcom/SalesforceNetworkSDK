@@ -671,6 +671,17 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
     newInternalOperation.freezable = NO;
     [newInternalOperation updateHandlersFromOperation:internalOperation];
     
+    //Add file data if exists
+    if (internalOperation.dataToBePosted.count > 0) {
+        for (NSDictionary *fileDict in internalOperation.dataToBePosted) {
+            NSString *paramName = [fileDict valueForKey:@"name"];
+            NSString *fileName = [fileDict valueForKey:@"filename"];
+            NSData *fileData = [fileDict objectForKey:@"data"];
+            NSString *mimeType = [fileDict valueForKey:@"mimetype"];
+            [newInternalOperation addData:fileData forKey:paramName mimeType:mimeType fileName:fileName];
+        }
+    }
+    
     //Clone custom encoding handler
     if (internalOperation.postDataEncodingHandler) {
         [newInternalOperation setCustomPostDataEncodingHandler:internalOperation.postDataEncodingHandler forType:operation.customPostDataEncodingContentType];
