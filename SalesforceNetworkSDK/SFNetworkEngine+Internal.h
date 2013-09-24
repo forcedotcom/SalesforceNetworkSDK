@@ -67,9 +67,9 @@
  */
 - (void)replayOperationsWaitingForNetwork;
 
-/**Clone an operation. Used to re-queue a failed operation
+/**Clone the internal operation. Used to re-queue a failed operation
  
 @param operation Existing `SFNetworkOperation` to clone from
  */
-- (SFNetworkOperation *)cloneOperation:(SFNetworkOperation *)operation;
+- (SFNetworkOperation *)cloneInternalOperation:(SFNetworkOperation *)operation;
 @end
