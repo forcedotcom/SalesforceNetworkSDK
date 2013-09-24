@@ -4,7 +4,7 @@
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "NO"
-      buildImplicitDependencies = "YES">
+      buildImplicitDependencies = "NO">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "109CB85D156C589D00937625"
-               BuildableName = "libSalesforceCommonUtils.a"
-               BlueprintName = "SalesforceCommonUtils"
-               ReferencedContainer = "container:../SalesforceCommonUtils/SalesforceCommonUtils.xcodeproj">
+               BlueprintIdentifier = "ABB5C25B148B3AE00056D3E9"
+               BuildableName = "libMKNetworkKit-iOS.a"
+               BlueprintName = "MKNetworkKit-iOS"
+               ReferencedContainer = "container:../../external/MKNetworkKit/MKNetworkKit-iOS/MKNetworkKit-iOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
