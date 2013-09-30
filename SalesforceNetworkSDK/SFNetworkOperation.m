@@ -281,10 +281,10 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     if (_internalOperation) {
         __weak SFNetworkOperation *weakSelf = self;
         [_internalOperation addCompletionHandler:^(MKNetworkOperation *completedOperation) {
-            if([self canCallback]) {
+            if([weakSelf canCallback]) {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                     //Perform all callbacks in background queue
-                    NSError *error = [self checkForErrorInResponse:completedOperation];
+                    NSError *error = [weakSelf checkForErrorInResponse:completedOperation];
                     if (nil != error) {
                         if (errorBlock) {
                             errorBlock(error);
@@ -296,7 +296,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                 });
             }
         } errorHandler:^(MKNetworkOperation *operation, NSError *error) {
-            NSError *serviceError = [self checkForErrorInResponseStr:self.responseAsString withError:error];
+            NSError *serviceError = [weakSelf checkForErrorInResponseStr:weakSelf.responseAsString withError:error];
             if (serviceError) {
                 error = serviceError;
             }
@@ -313,7 +313,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
             }
             
             if (errorBlock) {
-                if([self canCallback]) {
+                if([weakSelf canCallback]) {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
                         errorBlock(error);
                     });
