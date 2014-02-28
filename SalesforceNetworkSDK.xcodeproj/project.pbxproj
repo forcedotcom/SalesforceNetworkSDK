@@ -6,6 +6,20 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		2DE48CCA18BFAECD008345C7 /* Documentation */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 2DE48CCD18BFAECD008345C7 /* Build configuration list for PBXAggregateTarget "Documentation" */;
+			buildPhases = (
+				2DE48CCE18BFAEDF008345C7 /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = Documentation;
+			productName = Documentation;
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		100F54091614E03800FD5EB8 /* SFNetworkEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B76165161276F700B3CD58 /* SFNetworkEngine.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		100F540A1614E04300FD5EB8 /* SFNetworkOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B76167161276F700B3CD58 /* SFNetworkOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -174,6 +188,7 @@
 			projectRoot = "";
 			targets = (
 				1090C534161275BF0054B040 /* SalesforceNetworkSDK */,
+				2DE48CCA18BFAECD008345C7 /* Documentation */,
 			);
 		};
 /* End PBXProject section */
@@ -191,6 +206,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Generate the headers\nbuild/build.sh -v gen_headers";
+		};
+		2DE48CCE18BFAEDF008345C7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/appledoc \\\n--project-name \"${PROJECT_NAME}\" \\\n--project-company \"Salesforce.com\" \\\n--company-id \"com.salesforce\" \\\n--output \"${PROJECT_DIR}/../../build/artifacts/doc/${PROJECT_NAME}\" \\\n--install-docset \\\n--logformat xcode \\\n--keep-undocumented-objects \\\n--keep-undocumented-members \\\n--keep-intermediate-files \\\n--no-repeat-first-par \\\n--no-warn-invalid-crossref \\\n--merge-categories \\\n--exit-threshold 2 \\\n--docset-platform-family iphoneos \\\n--ignore \"*.m\" \\\n--include \"${PROJECT_DIR}/${PROJECT_NAME}/Documentation/Images\" \\\n--ignore \"LoadableCategory.h\" \\\n--index-desc \"${PROJECT_DIR}/readme.markdown\" \\\n\"${PROJECT_DIR}/${PROJECT_NAME}\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -327,6 +355,20 @@
 			};
 			name = Release;
 		};
+		2DE48CCB18BFAECD008345C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		2DE48CCC18BFAECD008345C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -344,6 +386,15 @@
 			buildConfigurations = (
 				1090C544161275BF0054B040 /* Debug */,
 				1090C545161275BF0054B040 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2DE48CCD18BFAECD008345C7 /* Build configuration list for PBXAggregateTarget "Documentation" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2DE48CCB18BFAECD008345C7 /* Debug */,
+				2DE48CCC18BFAECD008345C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
