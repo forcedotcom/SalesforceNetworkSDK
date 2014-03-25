@@ -60,7 +60,7 @@ NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";
     //Check for INVALID_SESSION
     id obj = [[error userInfo] objectForKey:kErrorCodeKeyInResponse];
     if(obj) {
-        if ([kInvalidSessionID isEqualToString:obj] || ![obj rangeOfString:kInvalidSessionID].location == NSNotFound) {
+        if ([kInvalidSessionID isEqualToString:obj] || [obj rangeOfString:kInvalidSessionID].length > 0) {
             return YES;
         }
     }
