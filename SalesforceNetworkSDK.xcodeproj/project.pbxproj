@@ -155,7 +155,6 @@
 				100F54501614E2C000FD5EB8 /* Sources */,
 				1090C532161275BF0054B040 /* Frameworks */,
 				100F54081614E03000FD5EB8 /* Headers */,
-				100F54071614DF7300FD5EB8 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -194,19 +193,6 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		100F54071614DF7300FD5EB8 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Generate the headers\nbuild/build.sh -v gen_headers";
-		};
 		2DE48CCE18BFAEDF008345C7 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
