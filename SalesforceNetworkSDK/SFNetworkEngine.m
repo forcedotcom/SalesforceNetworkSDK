@@ -223,19 +223,15 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
         [self log:SFLogLevelError format:@"Remote request URL is nil for params %@", params];
         return nil;
     }
-    NSMutableString *fullUrl = [NSMutableString stringWithString:self.coordinator.apiUrl];
-    if ([fullUrl hasSuffix:@"/"]) {
-        [fullUrl substringToIndex:[fullUrl (length - 1)]];
-    }
-    if (![url hasPrefix:@"/"]) {
-        url = [NSString stringWithFormat:@"/%@", url];
-    }
-
-    // If API path is nil or URL already starts with API path, construct with apiUrl only.
-    if ([NSString isEmpty:self.apiPath] || [[url lowercaseString] hasPrefix:[self.apiPath lowercaseString]]) {
-        [fullUrl appendString:url];
-    } else {
-        [fullUrl appendString:self.apiPath];
+    NSMutableString *fullUrl = [NSMutableString stringWithString:url];
+    if (![[url lowercaseString] hasPrefix:@"http:"] && ![[url lowercaseString] hasPrefix:@"https:"]) {
+        fullUrl = [NSMutableString stringWithString:self.coordinator.apiUrl];
+        if (![fullUrl hasSuffix:@"/"]) {
+            [fullUrl appendString:@"/"];
+        }
+        if ([url hasPrefix:@"/"]) {
+            url = [url substringFromIndex:1];
+        }
         [fullUrl appendString:url];
     }
     MKNetworkOperation *internalOperation = [engine operationWithURLString:fullUrl params:[NSMutableDictionary dictionaryWithDictionary:params] httpMethod:method];
