@@ -106,12 +106,6 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
 /** Return current network status*/
 @property (nonatomic, assign, readonly) SFNetworkStatus networkStatus;
 
-/** Server API root path. In the case of salesforce REST API, apiPath could be /services/data/v25.0 etc.
- 
- If this value is set and a relative URL is passed to `operationWithUrl`, `apiPath` will be used to construct the full URL. See `operationWithUrl` for details
- */
-@property (nonatomic, copy) NSString *apiPath;
-
 /**Default time out for all `SFNetworkOperation` executed by `SFNetworkEngine` in seconds. Default is 180 seconds
  */
 @property (nonatomic, assign) NSTimeInterval operationTimeout;
@@ -153,7 +147,7 @@ extern NSString * const SFNetworkOperationEngineResumedNotification;
 
 /** Returns a `SFNetworkOperation` that can be used to execute the specified remote call
  *
- * @param url Url to the remote service to invoke. If this url is a relative URL, `SFNetworkEngine` will automatically construct the full URL using the format of `[[SFOAuthCoordinator credentials] instanceUrl]`/`apiPath`/url if `apiPath is not nil or `[[SFOAuthCoordinator credentials] instanceUrl]`/url if `apiPath is nil. 
+ * @param url Url to the remote service to invoke. If this url is a relative URL, `SFNetworkEngine` will automatically construct the full URL.
  * @param params Key & value pair as request parameters
  * @param method the http method to use. Valid value include GET, POST, DELETE, PUT and PATCH
  * @param useSSL Set to YES to use SSL connection
