@@ -20,6 +20,7 @@
 @property (strong) NSString *userId;
 @property (strong) NSNumber *portNumber;
 @property (strong) NSNumber *sslPortNumber;
+@property (strong) NSString *apiUrl;
 
 /** Access token */
 @property (strong) NSString *accessToken;

@@ -219,46 +219,27 @@ static NSString * const kAuthoriationHeaderKey = @"Authorization";
 #pragma mark - Remote Request Methods 
 - (SFNetworkOperation *)operationWithUrl:(NSString *)url params:(NSDictionary *)params httpMethod:(NSString *)method ssl:(BOOL)useSSL {
     MKNetworkEngine *engine = [self internalNetworkEngine];
-    if ([NSString isEmpty:url]) {
+    if ([NSString isEmpty:url] || [NSString isEmpty:self.coordinator.apiUrl]) {
         [self log:SFLogLevelError format:@"Remote request URL is nil for params %@", params];
         return nil;
     }
-    if ([url hasPrefix:@"/"]) {
-        //take out the preceding "/"
-        url = [url substringFromIndex:1];
-    }
-    
-    NSString *lowerCaseUrl = [url lowercaseString];
-    
-    if (![lowerCaseUrl hasPrefix:@"http:"] && ![lowerCaseUrl hasPrefix:@"https:"]) {
-        //relative URL, construct full URL
-        NSString *scheme = useSSL ? @"https" : @"http";
-        NSString *portNumber = @"";
-        if (useSSL) {
-           portNumber =  self.coordinator.sslPortNumber? [NSString stringWithFormat:@":%d", [self.coordinator.sslPortNumber intValue]] : @"";
-        } else {
-           portNumber =  self.coordinator.portNumber? [NSString stringWithFormat:@":%d", [self.coordinator.portNumber intValue]] : @"";
+    NSMutableString *fullUrl = [NSMutableString stringWithString:url];
+    if (![[url lowercaseString] hasPrefix:@"http:"] && ![[url lowercaseString] hasPrefix:@"https:"]) {
+        fullUrl = [NSMutableString stringWithString:self.coordinator.apiUrl];
+        if (![fullUrl hasSuffix:@"/"]) {
+            [fullUrl appendString:@"/"];
         }
-        
-        //If API path is nil or URL already starts with API path, construct with instanceUrl only
-        if ([NSString isEmpty:self.apiPath] || [lowerCaseUrl hasPrefix:[self.apiPath lowercaseString]]) {
-            url = [NSString stringWithFormat:@"%@://%@%@/%@", scheme, self.remoteHost, portNumber, url];
+        if ([url hasPrefix:@"/"]) {
+            url = [url substringFromIndex:1];
         }
-        else {
-            url = [NSString stringWithFormat:@"%@://%@%@/%@/%@",scheme, self.remoteHost, portNumber, self.apiPath, url];
-        }
+        [fullUrl appendString:url];
     }
-    else {
-        useSSL = [lowerCaseUrl hasPrefix:@"https:"];
-    }
-    
-    MKNetworkOperation *internalOperation = [engine operationWithURLString:url params:[NSMutableDictionary dictionaryWithDictionary:params] httpMethod:method];
+    MKNetworkOperation *internalOperation = [engine operationWithURLString:fullUrl params:[NSMutableDictionary dictionaryWithDictionary:params] httpMethod:method];
     internalOperation.enableHttpPipelining = self.enableHttpPipeling;
     internalOperation.freezable = NO;
-    SFNetworkOperation *operation = [[SFNetworkOperation alloc] initWithOperation:internalOperation url:url method:method ssl:useSSL];
+    SFNetworkOperation *operation = [[SFNetworkOperation alloc] initWithOperation:internalOperation url:fullUrl method:method ssl:useSSL];
     operation.operationTimeout = self.operationTimeout;
     operation.customHeaders = self.customHeaders;
-   
     return operation;
 }
 
