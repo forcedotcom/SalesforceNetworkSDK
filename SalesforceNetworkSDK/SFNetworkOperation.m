@@ -519,7 +519,7 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
     
     id jsonResponse = [self responseAsJSON];
     if (jsonResponse && [jsonResponse isKindOfClass:[NSArray class]]) {
-        if ([jsonResponse count] == 1) {
+        if ([jsonResponse count] > 0) {
             id potentialError = [jsonResponse objectAtIndex:0];
             if ([potentialError isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *errorDictionary = (NSDictionary *)potentialError;
@@ -528,7 +528,8 @@ static NSInteger const kFailedWithServerReturnedErrorCode = 999;
                 if (nil != potentialErrorCode && nil != potentialErrorMessage) {
                     NSDictionary *errorDictionary = @{
                                                       NSLocalizedDescriptionKey : potentialErrorMessage,
-                                                      NSLocalizedFailureReasonErrorKey : potentialErrorCode };
+                                                      NSLocalizedFailureReasonErrorKey : potentialErrorCode,
+                                                      kSFOriginalApiError : jsonResponse };
                     NSError *translatedError = [NSError errorWithDomain:error.domain code:error.code userInfo:errorDictionary];
                     return translatedError;
                 }

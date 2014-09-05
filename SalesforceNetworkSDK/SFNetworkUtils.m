@@ -10,6 +10,7 @@
 
 NSString * const kErrorCodeKeyInResponse = @"errorCode";
 NSString * const kErrorMessageKeyInResponse = @"message";
+NSString * const kSFOriginalApiError = @"SFOriginalApiError";
 
 NSString * const kInvalidSessionID = @"INVALID_SESSION_ID";
 
