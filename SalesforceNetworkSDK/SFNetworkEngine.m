@@ -29,8 +29,6 @@ NSString * const SFNetworkOperationEngineSuspendedNotification = @"SFNetworkOper
 NSString * const SFNetworkOperationEngineResumedNotification = @"SFNetworkOperationEngineResumedNotification";
 
 static NSInteger const kDefaultTimeOut = 3 * 60; //3 minutes
-static NSInteger const kOAuthErrorCode = 999;
-static NSTimeInterval const kDefaultRetryDelay = 30; //30 seconds
 
 static NSString * const kAuthoriationHeader = @"OAuth %@";
 static NSString * const kAuthoriationHeaderKey = @"Authorization";
