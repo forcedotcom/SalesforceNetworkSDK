@@ -13,7 +13,6 @@
 #import "SFNetworkUtils.h"
 
 static NSString *kDefaultFileDataMimeType = @"multipart/form-data";
-static NSInteger const kFailedWithServerReturnedErrorCode = 999;
 
 @implementation SFNetworkOperation
 @synthesize tag = _tag;
