@@ -155,6 +155,7 @@
 				100F54501614E2C000FD5EB8 /* Sources */,
 				1090C532161275BF0054B040 /* Frameworks */,
 				100F54081614E03000FD5EB8 /* Headers */,
+				827DD5111A83046E00519F03 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -205,6 +206,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "docOutputDir=\"${PROJECT_DIR}/../../build/artifacts/doc/build_out/${PROJECT_NAME}\"\nif [ ! -d \"$docOutputDir\" ]; then\nmkdir -p \"$docOutputDir\"\nfi\n\n/usr/bin/headerdoc2html \\\n-o \"$docOutputDir\" \\\n$PROJECT_DIR/SalesforceNetworkSDK/ -j -C -L -N -Q -t --tocformat=\"default\"";
+		};
+		827DD5111A83046E00519F03 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"$SRCROOT/../../shared/common/build/tools/generate_headers.sh\" -o \"$BUILT_PRODUCTS_DIR/Headers/$PRODUCT_NAME/$PRODUCT_NAME.h\" -u \"$SRCROOT/$TARGET_NAME/$TARGET_NAME.h\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
